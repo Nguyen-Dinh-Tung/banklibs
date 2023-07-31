@@ -5,7 +5,6 @@ function logForDevTest(): Exclude<LoggerOptions, boolean | 'all'> {
   if (['test', 'dev'].includes(process.env.NODE_ENV)) {
     return ['query'];
   }
-
   return [];
 }
 
