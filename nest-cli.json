@@ -45,6 +45,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/exceptions/tsconfig.lib.json"
       }
+    },
+    "uploader": {
+      "type": "application",
+      "root": "apps/uploader",
+      "entryFile": "main",
+      "sourceRoot": "apps/uploader/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/uploader/tsconfig.app.json"
+      }
+    },
+    "job-runner": {
+      "type": "application",
+      "root": "apps/job-runner",
+      "entryFile": "main",
+      "sourceRoot": "apps/job-runner/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/job-runner/tsconfig.app.json"
+      }
     }
   }
 }
