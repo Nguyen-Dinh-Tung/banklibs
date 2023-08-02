@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn } from 'typeorm';
+import { DeleteDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { DateColumn } from './custom-column.database';
 
 export class IdEntity {
@@ -14,7 +14,7 @@ export class DateEntity {
 }
 
 export class DeleteEntity {
-  @DateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
 }
 

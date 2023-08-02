@@ -1,0 +1,24 @@
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { IdDateEntity, IsActiveTrueColumn, NotNullColum } from '../database';
+import { RoleActionsEnum } from '../enum/database.enum';
+import { UserAdminEntity } from './user-admins.entity';
+
+@Entity('role')
+export class RoleEntity extends IdDateEntity {
+  @NotNullColum({
+    type: 'enum',
+    enum: RoleActionsEnum,
+    enumName: 'RoleActionsEnum',
+  })
+  action: RoleActionsEnum;
+
+  @NotNullColum()
+  root: string;
+
+  @ManyToOne(() => UserAdminEntity, (user) => user.id)
+  @JoinColumn()
+  user: UserAdminEntity;
+
+  @IsActiveTrueColumn()
+  isActive: boolean;
+}

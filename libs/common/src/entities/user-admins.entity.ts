@@ -1,4 +1,4 @@
-import { Entity } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { IdDateEntity, IsActiveTrueColumn, NotNullColum } from '../database';
 
 @Entity('user_admin')
@@ -17,4 +17,7 @@ export class UserAdminEntity extends IdDateEntity {
 
   @IsActiveTrueColumn()
   isActive: boolean;
+
+  @Column({ default: false })
+  isRoot: boolean;
 }
