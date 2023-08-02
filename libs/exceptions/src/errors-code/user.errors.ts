@@ -1,1 +1,4 @@
-export enum UserError {}
+export enum UserError {
+  ERROR_EXISTED_USER = 'ERROR_EXISTED_USER',
+  ERROR_USER_NOT_EXISTTING = 'ERROR_USER_NOT_EXISTTING',
+}

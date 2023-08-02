@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { Public } from '@app/common';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('auth')
 @ApiBearerAuth()
@@ -13,6 +14,11 @@ export class AuthController {
   @Post('register')
   @Public()
   async register(@Body() data: RegisterUserDto) {
-    return 'fack';
+    return await this.authService.register(data);
+  }
+
+  @Post('login')
+  async login(@Body() data: LoginUserDto) {
+    return await this.authService.login(data);
   }
 }

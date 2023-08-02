@@ -5,17 +5,17 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MulterModule } from '@nestjs/platform-express';
+import { EnvVariable, ServeStaticDynamic } from '@app/common';
+console.log(join('.', '/uploads/user/'), `join('.', '/uploads/user/')`);
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', './uploads'),
-    }),
+    ServeStaticDynamic.register(EnvVariable.SERVER_STATIC_USER),
     MulterModule.register({
-      dest: './uploads',
+      dest: './uploads/',
     }),
   ],
   controllers: [UploaderController],
