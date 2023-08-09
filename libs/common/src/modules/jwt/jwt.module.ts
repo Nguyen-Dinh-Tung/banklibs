@@ -11,15 +11,13 @@ export class JwtModuleDynamic {
         JwtModule.registerAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
-          useFactory: (configService: ConfigService) => {
-            return {
-              secret: configService.get<string>(envVariable),
-              global: true,
-              signOptions: {
-                expiresIn: '30d',
-              },
-            };
-          },
+          useFactory: (configService: ConfigService) => ({
+            global: true,
+            secret: configService.get<string>(envVariable),
+            signOptions: {
+              expiresIn: '30d',
+            },
+          }),
         }),
       ],
       providers: [JwtService],

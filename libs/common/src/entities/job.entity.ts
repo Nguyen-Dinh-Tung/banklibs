@@ -1,7 +1,7 @@
 import { Entity } from 'typeorm';
 import { IdDateDeleteEntity, NotNullColum } from '../database';
 
-@Entity()
+@Entity('job')
 export class JobEntity extends IdDateDeleteEntity {
   @NotNullColum({ unique: true })
   name: string;

@@ -6,3 +6,5 @@ export * from './decorators';
 export * from './modules';
 export * from './constants';
 export * from './helpers';
+export * from './entities';
+export * from './interfaces';

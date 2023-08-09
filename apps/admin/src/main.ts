@@ -10,7 +10,7 @@ import { AdminModule } from './admin.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AdminModule);
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api');
 
   morgan.token('body', function (req: any) {
     return JSON.stringify(req?.body ?? '{}');

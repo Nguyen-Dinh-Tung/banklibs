@@ -11,3 +11,4 @@ export * from './user-admins.entity';
 export * from './user-balance.entity';
 export * from './user-verification.entity';
 export * from './job.entity';
+export * from './user-admins.entity';

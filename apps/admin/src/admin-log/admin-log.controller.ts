@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AdminLogService } from './admin-log.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
@@ -7,4 +7,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiBearerAuth()
 export class AdminLogController {
   constructor(private readonly adminLogService: AdminLogService) {}
+
+  @Get()
+  async findAll() {
+    return await this.adminLogService.findAll();
+  }
 }

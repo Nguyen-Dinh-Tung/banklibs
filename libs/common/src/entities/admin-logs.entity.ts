@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { IdDateEntity, NotNullColum } from '../database';
 import { UserAdminEntity } from './user-admins.entity';
 

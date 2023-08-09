@@ -44,7 +44,7 @@ export class UserEntity extends IdDateEntity {
   @NotNullColum({ length: '30' })
   username: string;
 
-  @NotNullColum({ length: '50' })
+  @NotNullColum({})
   password: string;
 
   @IsActiveTrueColumn()
@@ -71,12 +71,14 @@ export class UserEntity extends IdDateEntity {
   beforeInsert() {
     this.salt = bcrypt.genSaltSync(10);
     this.password = bcrypt.hashSync(this.password, this.salt);
+    this.previousPassword = this.password;
   }
 
   @BeforeUpdate()
   beforeUpdate() {
     if (this.password !== this.previousPassword) {
       this.password = bcrypt.hashSync(this.password, this.salt);
+      this.previousPassword = this.password;
     }
   }
 }

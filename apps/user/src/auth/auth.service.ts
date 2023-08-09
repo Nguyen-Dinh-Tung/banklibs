@@ -6,12 +6,12 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { AppHttpBadRequest, UserError } from '@app/exceptions';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtInterface } from './interface/jwt.interface';
 import bcrypt from 'bcrypt';
 import {
   KycStatusUserEnum,
   TypeVerificationEnum,
 } from '@app/common/enum/database.enum';
+import { JwtInterface } from '@app/common';
 
 @Injectable()
 export class AuthService {
