@@ -1,9 +1,11 @@
+import { ValidateCityCustom, ValidatePhoneCustom } from '@app/common';
+import { CountryCode } from '@app/common/enum/database.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsEnum,
   IsInt,
   IsNotEmpty,
-  IsPhoneNumber,
   IsString,
   IsUUID,
   IsUrl,
@@ -21,7 +23,7 @@ export class RegisterUserDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsPhoneNumber('VN')
+  @ValidatePhoneCustom()
   phone: string;
 
   @ApiProperty()
@@ -79,4 +81,14 @@ export class RegisterUserDto {
   @IsString()
   @Length(6, 30)
   password: string;
+
+  @ApiProperty({ enum: CountryCode })
+  @IsNotEmpty()
+  @IsEnum(CountryCode)
+  country: CountryCode;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @ValidateCityCustom()
+  city: string;
 }

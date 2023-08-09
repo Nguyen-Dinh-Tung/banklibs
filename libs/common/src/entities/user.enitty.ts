@@ -50,6 +50,12 @@ export class UserEntity extends IdDateEntity {
   @IsActiveTrueColumn()
   isActive: string;
 
+  @NotNullColum({})
+  country: string;
+
+  @NotNullColum({})
+  city: string;
+
   @OneToMany(() => UserVerificationEntity, (verification) => verification.id, {
     nullable: true,
   })

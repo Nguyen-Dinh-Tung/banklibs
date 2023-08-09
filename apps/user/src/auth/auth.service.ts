@@ -1,4 +1,4 @@
-import { UserEntity } from '@app/common/entities';
+import { UserEntity, UserVerificationEntity } from '@app/common/entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,12 +7,21 @@ import { AppHttpBadRequest, UserError } from '@app/exceptions';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtInterface } from './interface/jwt.interface';
+import bcrypt from 'bcrypt';
+import {
+  KycStatusUserEnum,
+  TypeVerificationEnum,
+} from '@app/common/enum/database.enum';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+
+    @InjectRepository(UserVerificationEntity)
+    private readonly userVerificationRepo: Repository<UserVerificationEntity>,
+
     private readonly jwtService: JwtService,
   ) {}
 
@@ -24,7 +33,18 @@ export class AuthService {
     if (checkUser) {
       throw new AppHttpBadRequest(UserError.ERROR_EXISTED_USER);
     }
-    await this.userRepo.insert(this.userRepo.create(data));
+
+    const newUser = this.userRepo.create(data);
+
+    await this.userRepo.insert(newUser);
+
+    await this.userVerificationRepo.insert(
+      this.userVerificationRepo.create({
+        kycStatus: KycStatusUserEnum.PENDING,
+        type: TypeVerificationEnum.INFORMATION,
+        user: newUser,
+      }),
+    );
 
     return {
       success: true,
@@ -39,6 +59,10 @@ export class AuthService {
 
     if (!checkUser) {
       throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+    }
+
+    if (!bcrypt.compareSync(data.password, checkUser.password)) {
+      throw new AppHttpBadRequest(UserError.ERROR_PASSWORD_FAILT);
     }
 
     return {
