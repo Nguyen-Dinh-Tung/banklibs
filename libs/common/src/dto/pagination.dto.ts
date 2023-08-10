@@ -36,6 +36,7 @@ export class PageMeta {
     this.limit = limit;
   }
 }
+
 interface IPaginated<T> {
   docs: T[];
   meta: PageMeta;

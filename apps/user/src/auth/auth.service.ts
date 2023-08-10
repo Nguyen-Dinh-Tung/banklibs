@@ -1,12 +1,16 @@
-import { UserEntity, UserVerificationEntity } from '@app/common/entities';
+import {
+  JobEntity,
+  UserEntity,
+  UserVerificationEntity,
+} from '@app/common/entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { AppHttpBadRequest, UserError } from '@app/exceptions';
+import { AppHttpBadRequest, JobErrors, UserError } from '@app/exceptions';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import {
   KycStatusUserEnum,
   TypeVerificationEnum,
@@ -22,6 +26,9 @@ export class AuthService {
     @InjectRepository(UserVerificationEntity)
     private readonly userVerificationRepo: Repository<UserVerificationEntity>,
 
+    @InjectRepository(JobEntity)
+    private readonly jobRepo: Repository<JobEntity>,
+
     private readonly jwtService: JwtService,
   ) {}
 
@@ -34,7 +41,23 @@ export class AuthService {
       throw new AppHttpBadRequest(UserError.ERROR_EXISTED_USER);
     }
 
-    const newUser = this.userRepo.create(data);
+    const checkJob = await this.jobRepo.findOne({
+      where: {
+        id: data.idJob,
+      },
+    });
+
+    if (!checkJob) {
+      throw new AppHttpBadRequest(JobErrors.ERROR_JOB_NOT_FOUND);
+    }
+
+    delete data.idJob;
+
+    const newUser = this.userRepo.create({
+      ...data,
+      job: checkJob,
+      createdAt: new Date().toISOString(),
+    });
 
     await this.userRepo.insert(newUser);
 
@@ -43,6 +66,7 @@ export class AuthService {
         kycStatus: KycStatusUserEnum.PENDING,
         type: TypeVerificationEnum.INFORMATION,
         user: newUser,
+        createdAt: new Date().toISOString(),
       }),
     );
 
@@ -61,7 +85,7 @@ export class AuthService {
       throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
     }
 
-    if (!bcrypt.compareSync(data.password, checkUser.password)) {
+    if (!bcrypt.compare(data.password, checkUser.password)) {
       throw new AppHttpBadRequest(UserError.ERROR_PASSWORD_FAILT);
     }
 
@@ -76,6 +100,12 @@ export class AuthService {
   }
 
   genToken(data: JwtInterface) {
-    return this.jwtService.signAsync(data);
+    return this.jwtService.sign(data, {
+      secret: process.env.SECRET_KEY,
+    });
+  }
+
+  async getMe(user: UserEntity) {
+    return { docs: user };
   }
 }

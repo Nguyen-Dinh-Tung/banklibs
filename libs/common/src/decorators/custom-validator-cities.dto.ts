@@ -4,7 +4,8 @@ import {
   ValidationOptions,
 } from 'class-validator';
 import * as citiesState from 'country-state-city';
-import _ from 'lodash';
+import * as _ from 'lodash';
+
 export function ValidateCityCustom(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
