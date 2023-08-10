@@ -13,11 +13,11 @@ export class QueryDto extends PageRequest {
 export class QueryCrudDateDto extends QueryDto {
   @IsOptional()
   @ApiPropertyOptional()
-  createdAt: Date;
+  createdAt?: Date;
 
   @IsOptional()
   @ApiPropertyOptional()
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 export class QueryDate extends QueryDto {
