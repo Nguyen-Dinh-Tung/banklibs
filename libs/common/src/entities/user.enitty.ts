@@ -1,4 +1,12 @@
-import { BeforeInsert, BeforeUpdate, Entity, OneToMany, Unique } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 import {
   IdDateEntity,
   IsActiveTrueColumn,
@@ -7,6 +15,7 @@ import {
 } from '../database';
 import { UserVerificationEntity } from './user-verification.entity';
 import * as bcrypt from 'bcrypt';
+import { JobEntity } from './job.entity';
 
 @Entity('user')
 @Unique('user_unique', ['identifierNumber', 'email'])
@@ -23,8 +32,9 @@ export class UserEntity extends IdDateEntity {
   @NotNullColum()
   address: string;
 
-  @NotNullColum()
-  job: string;
+  @ManyToOne(() => JobEntity, (job) => job.id)
+  @JoinColumn()
+  job: JobEntity;
 
   @NotNullColum({ name: 'identifier_number', unique: true })
   identifierNumber: string;

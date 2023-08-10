@@ -20,6 +20,8 @@ export function ValidatePhoneCustom(validationOptions?: ValidationOptions) {
           const country = citiesState.Country.getCountryByCode(
             arg.object['country'],
           );
+          console.log(country, 'fone');
+
           const countryCode = country.isoCode as unknown as CountryCode;
           return libphonenumber.isValidPhoneNumber(value, countryCode)
             ? true

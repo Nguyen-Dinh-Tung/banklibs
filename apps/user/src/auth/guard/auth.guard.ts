@@ -1,5 +1,5 @@
 import { IS_PUBLIC_KEY } from '@app/common';
-import { UserAdminEntity } from '@app/common/entities';
+import { UserAdminEntity, UserEntity } from '@app/common/entities';
 import {
   CanActivate,
   ExecutionContext,
@@ -13,13 +13,13 @@ import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private readonly userRepo: Repository<UserAdminEntity>;
+  private readonly userRepo: Repository<UserEntity>;
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
     private readonly dataSource: DataSource,
   ) {
-    this.userRepo = this.dataSource.getRepository(UserAdminEntity);
+    this.userRepo = this.dataSource.getRepository(UserEntity);
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +28,6 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) {
-      // 💡 See this condition
       return true;
     }
 
@@ -52,6 +51,7 @@ export class AuthGuard implements CanActivate {
           id: payload.id,
         },
       });
+
       if (!user) return false;
 
       request['user'] = user;

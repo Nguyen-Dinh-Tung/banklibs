@@ -8,7 +8,6 @@ import {
   IsNotEmpty,
   IsString,
   IsUUID,
-  IsUrl,
   Length,
   Max,
   Min,
@@ -36,6 +35,7 @@ export class RegisterUserDto {
   @IsNotEmpty()
   @IsString()
   address: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -57,17 +57,17 @@ export class RegisterUserDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsUrl()
+  @IsString()
   avatar: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsUrl()
+  @IsString()
   backCard: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsUrl()
+  @IsString()
   frontCard: string;
 
   @ApiProperty()
@@ -83,8 +83,8 @@ export class RegisterUserDto {
   password: string;
 
   @ApiProperty({ enum: CountryCode })
-  @IsNotEmpty()
   @IsEnum(CountryCode)
+  @IsNotEmpty()
   country: CountryCode;
 
   @ApiProperty()
