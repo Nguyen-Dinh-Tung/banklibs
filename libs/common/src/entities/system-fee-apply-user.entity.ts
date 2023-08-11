@@ -10,6 +10,6 @@ export class SystemFeeApplyUserEntity extends IdDateDeleteEntity {
   user: UserEntity;
 
   @ManyToOne(() => SystemFeeEntity, (systemFee) => systemFee.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'system_fee' })
   systemFee: SystemFeeEntity;
 }

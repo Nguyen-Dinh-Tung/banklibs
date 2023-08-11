@@ -16,6 +16,7 @@ export class UserVerificationEntity extends IdDateEntity {
     type: 'enum',
     enum: KycStatusUserEnum,
     enumName: 'KycStatusUserEnum',
+    name: 'kyc_status',
   })
   kycStatus: KycStatusUserEnum;
 

@@ -6,7 +6,7 @@ import { NotificationEntity } from './notification.enity';
 @Entity('notification_user')
 export class NotificationUserEntity extends IdDateEntity {
   @ManyToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @ManyToOne(() => NotificationEntity, (notification) => notification.id)

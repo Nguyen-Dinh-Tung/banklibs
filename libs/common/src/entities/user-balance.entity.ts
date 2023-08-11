@@ -6,7 +6,7 @@ import { HistoryBalanceEntity } from './history-balance.entity';
 @Entity('user_balance')
 export class UserBalanceEntity extends IdDateEntity {
   @OneToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @NotNullColum({ default: 0, type: 'bigint' })
@@ -15,6 +15,9 @@ export class UserBalanceEntity extends IdDateEntity {
   @NotNullColum({ default: false })
   freeze: boolean;
 
+  @NotNullColum({ name: 'bank_number', unique: true, length: 12 })
+  bankNumber: string;
+
   @OneToMany(() => HistoryBalanceEntity, (history) => history.id)
-  historyBalance: HistoryBalanceEntity;
+  historyBalance: HistoryBalanceEntity[];
 }

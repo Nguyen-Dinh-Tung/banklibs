@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   Unique,
 } from 'typeorm';
 import {
@@ -16,6 +17,7 @@ import {
 import { UserVerificationEntity } from './user-verification.entity';
 import * as bcrypt from 'bcrypt';
 import { JobEntity } from './job.entity';
+import { UserBalanceEntity } from './user-balance.entity';
 
 @Entity('user')
 @Unique('user_unique', ['identifierNumber', 'email'])
@@ -71,16 +73,7 @@ export class UserEntity extends IdDateEntity {
   })
   verifies: UserVerificationEntity[];
 
-  @NullColumn()
-  salt: string;
-
-  @NullColumn({ select: false })
-  previousPassword: string;
-
-  @BeforeInsert()
-  beforeInsert() {
-    this.salt = bcrypt.genSaltSync(10);
-    this.password = bcrypt.hashSync(this.password, this.salt);
-    this.previousPassword = this.password;
-  }
+  @OneToOne(() => UserBalanceEntity, (balance) => balance.id)
+  @JoinColumn()
+  balance: UserBalanceEntity;
 }

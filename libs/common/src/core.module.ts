@@ -4,11 +4,13 @@ import { DatabaseOptions } from './database';
 import {
   HistoryBalanceEntity,
   JobEntity,
+  TransactionEntity,
   UserBalanceEntity,
   UserEntity,
   UserVerificationEntity,
 } from './entities';
 import { ConfigModule } from '@nestjs/config';
+import { RefundEntity } from './entities/refund.entity';
 @Module({})
 @Global()
 export class CoreModule {
@@ -31,6 +33,8 @@ export class CoreModule {
           JobEntity,
           HistoryBalanceEntity,
           UserBalanceEntity,
+          TransactionEntity,
+          RefundEntity,
         ]),
       ],
       exports: [TypeOrmModule],

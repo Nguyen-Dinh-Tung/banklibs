@@ -16,7 +16,7 @@ export class RoleEntity extends IdDateEntity {
   root: string;
 
   @ManyToOne(() => UserAdminEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserAdminEntity;
 
   @IsActiveTrueColumn()

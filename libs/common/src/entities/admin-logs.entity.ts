@@ -13,10 +13,10 @@ export class AdminLogsEntity extends IdDateEntity {
   @NotNullColum()
   entity: string;
 
-  @NotNullColum()
+  @NotNullColum({ name: 'id_entity' })
   idEntity: string;
 
   @ManyToOne(() => UserAdminEntity, (admin) => admin.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserAdminEntity;
 }
