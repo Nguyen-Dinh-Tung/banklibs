@@ -83,12 +83,4 @@ export class UserEntity extends IdDateEntity {
     this.password = bcrypt.hashSync(this.password, this.salt);
     this.previousPassword = this.password;
   }
-
-  @BeforeUpdate()
-  beforeUpdate() {
-    if (this.password !== this.previousPassword) {
-      this.password = bcrypt.hashSync(this.password, this.salt);
-      this.previousPassword = this.password;
-    }
-  }
 }

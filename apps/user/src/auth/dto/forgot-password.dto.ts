@@ -7,7 +7,7 @@ export class ForgotPasswordDto {
   username: string;
 }
 
-export class GetPasswordDto extends ForgotPasswordDto {
+export class ChangePasswordDto extends ForgotPasswordDto {
   @IsNotEmpty()
   @ApiProperty()
   code: string;

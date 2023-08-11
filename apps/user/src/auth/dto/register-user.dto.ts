@@ -1,5 +1,5 @@
 import { ValidateCityCustom, ValidatePhoneCustom } from '@app/common';
-import { CountryCode } from '@app/common/enum/database.enum';
+import { CountryCode } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,

@@ -7,7 +7,7 @@ import {
   otpEmailTitle,
   titleOtpForgotPassword,
 } from '@app/common';
-import { TypeOtpEmailEnum } from '@app/common/enum/database.enum';
+import { TypeOtpEmailEnum } from '@app/common';
 import { AppHttpBadRequest, OtpErrors } from '@app/exceptions';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,7 +35,7 @@ export class OtpService {
     const otp = otpEmailRandom(+process.env.OTP_EMAIL_LENGTH);
 
     if (checkExistOtp) {
-      if (checkExistOtp.expires > Number(Date.now())) {
+      if (Number(checkExistOtp.expires) > Number(Date.now())) {
         if (checkExistOtp.times >= +process.env.MAX_GENERATE_OTP_EMAIL) {
           throw new AppHttpBadRequest(OtpErrors.ERROR_MAX_GENERATE_OTP);
         }

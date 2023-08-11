@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { OtpService } from './otp.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User, UserEntity, otpEmailTitle } from '@app/common';
-import { TypeOtpEmailEnum } from '@app/common/enum/database.enum';
+import { TypeOtpEmailEnum } from '@app/common';
 
 @Controller('otp')
 @ApiTags('Otp')

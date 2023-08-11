@@ -2,6 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { PageRequest } from './pagination.dto';
 import { IsEnum, IsOptional } from 'class-validator';
 import { OrderEnum } from '../enum/order.enum';
+import { Transform } from 'class-transformer';
 
 export class QueryDto extends PageRequest {
   @IsOptional()
@@ -23,10 +24,12 @@ export class QueryCrudDateDto extends QueryDto {
 export class QueryDate extends QueryDto {
   @IsOptional()
   @ApiPropertyOptional()
+  @Transform((data) => new Date(data.value))
   startDate: Date;
 
   @IsOptional()
   @ApiPropertyOptional()
+  @Transform((data) => new Date(data.value))
   endDate: Date;
 }
 

@@ -2,9 +2,13 @@ import { AppHttpBadRequest, UploaderErrors } from '@app/exceptions';
 import { Injectable, PipeTransform } from '@nestjs/common';
 const mimeType = ['jpg', 'jpeg', 'png'];
 @Injectable()
-export class ValidatorFilePipe implements PipeTransform {
+export class ValidatorFilesPipe implements PipeTransform {
   transform(value: any) {
-    this.validator(value);
+    Object.keys(value).some((key) => {
+      if (value[key]) {
+        this.validator(value[key][0]);
+      }
+    });
     return value;
   }
 

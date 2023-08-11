@@ -9,3 +9,4 @@ export * from './helpers';
 export * from './entities';
 export * from './interfaces';
 export * from './service';
+export * from './interceptor';

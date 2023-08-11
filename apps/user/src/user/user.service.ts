@@ -1,12 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { QueryUserDto, UserInfor } from './dto/query-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  PageMetaDto,
-  UserEntity,
-  UserVerificationEntity,
-  otpEmailRandom,
-} from '@app/common';
+import { PageMetaDto, UserEntity, UserVerificationEntity } from '@app/common';
 import { Repository } from 'typeorm';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { OtpService } from '../otp/otp.service';
@@ -14,7 +9,7 @@ import {
   KycStatusUserEnum,
   TypeOtpEmailEnum,
   TypeVerificationEnum,
-} from '@app/common/enum/database.enum';
+} from '@app/common';
 import { AppHttpBadRequest, VerificationError } from '@app/exceptions';
 
 @Injectable()
@@ -37,15 +32,21 @@ export class UserService {
       .orderBy('user.createdAt', query.order);
 
     if (query.startDate) {
-      queryBuilder.andWhere('user.createdAt >= :startDate', {
-        startDate: query.startDate,
-      });
+      queryBuilder.andWhere(
+        `user.createdAt >= STR_TO_DATE(:startDate, '%Y-%m-%d %H:%i:%s.%f')`,
+        {
+          startDate: query.startDate,
+        },
+      );
     }
 
     if (query.endDate) {
-      queryBuilder.andWhere('user.createdAt >= :endDate', {
-        endDate: query.endDate,
-      });
+      queryBuilder.andWhere(
+        `user.createdAt <= STR_TO_DATE(:endDate, '%Y-%m-%d %H:%i:%s.%f')`,
+        {
+          endDate: query.endDate,
+        },
+      );
     }
 
     if (query.verificationLevel) {
@@ -111,9 +112,5 @@ export class UserService {
     );
 
     return { success: true };
-  }
-
-  async forgotPassword(user: UserEntity) {
-    return await this.otpService.forgotPassword(user);
   }
 }

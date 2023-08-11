@@ -1,10 +1,14 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { Public, User, UserEntity } from '@app/common';
 import { LoginUserDto } from './dto/login-user.dto';
-import { ForgotPasswordDto, GetPasswordDto } from './dto/forgot-password.dto';
+import {
+  ForgotPasswordDto,
+  ChangePasswordDto,
+} from './dto/forgot-password.dto';
+import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 
 @Controller('auth')
 @ApiBearerAuth()
@@ -31,15 +35,21 @@ export class AuthController {
     return await this.authService.getMe(user);
   }
 
-  @Get('forgot-password')
+  @Get('forgot-password/:username')
   @Public()
-  async forgotPassword(@Body() data: ForgotPasswordDto) {
-    return await this.authService.forgotPassword(data);
+  async forgotPassword(@Param() param: ForgotPasswordDto) {
+    return await this.authService.forgotPassword(param);
   }
 
   @Post('forgot-password')
   @Public()
-  async getPassword(@Body() data: GetPasswordDto) {
+  async getPassword(@Body() data: ChangePasswordDto) {
     return await this.authService.getPassword(data);
+  }
+
+  @Patch('profile')
+  @ApiConsumes('multipart/form-data')
+  async update(@Body() data: UpdateMyProfileDto, @User() user: UserEntity) {
+    return await this.authService.update(data, user);
   }
 }
