@@ -14,6 +14,7 @@ export class OtpModule {
       imports: [TypeOrmModule.forFeature([OtpEmailEntity])],
       controllers: [OtpController],
       providers: [OtpService, EmailOtpService],
+      exports: [OtpService],
     };
   }
 }

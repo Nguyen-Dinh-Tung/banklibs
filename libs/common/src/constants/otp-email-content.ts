@@ -1,2 +1,2 @@
-export const otpEmailTitle = 'System otp verification';
-export const otpEmailContent = 'Your otp : ';
+export const otpEmailTitle = 'Banlibs OTP verification';
+export const otpEmailContent = 'Please private your OTP : ';

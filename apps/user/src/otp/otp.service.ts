@@ -11,7 +11,7 @@ import { AppHttpBadRequest, OtpErrors } from '@app/exceptions';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class OtpService {
   constructor(
@@ -68,5 +68,35 @@ export class OtpService {
         createdAt: new Date().toISOString(),
       }),
     );
+  }
+
+  async verifyOtpEmail(code: string, user: UserEntity) {
+    const checkOtp = await this.otpEmailRepo.findOne({
+      where: {
+        isActive: true,
+        deletedAt: null,
+        user: {
+          id: user.id,
+        },
+      },
+    });
+
+    if (!checkOtp) {
+      throw new AppHttpBadRequest(OtpErrors.ERROR_OTP_EMAIL_NOT_FOUND);
+    }
+
+    if (!bcrypt.compareSync(code, checkOtp.code)) {
+      throw new AppHttpBadRequest(OtpErrors.ERROR_OTP_EMAIL_INVALID);
+    } else {
+      if (Number(checkOtp.expires) > Date.now()) {
+        throw new AppHttpBadRequest(OtpErrors.ERROR_OTP_EMAIL_EXPIRED);
+      }
+    }
+
+    await this.otpEmailRepo.softDelete({
+      user: {
+        id: user.id,
+      },
+    });
   }
 }
