@@ -1,9 +1,8 @@
-import { TransactionEntity, UserBalanceEntity } from '@app/common';
+import { TransactionEntity, UserBalanceEntity, UserEntity } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CheckReceiverDto, ReceiverDto } from './dto/check-receiver.dto';
-import { AppHttpBadRequest, TransactionErrors } from '@app/exceptions';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 
 @Injectable()
 export class TransactionService {
@@ -14,4 +13,6 @@ export class TransactionService {
     @InjectRepository(UserBalanceEntity)
     private readonly userBalanceRepo: Repository<UserBalanceEntity>,
   ) {}
+
+  async createTransaction(user: UserEntity, data: CreateTransactionDto) {}
 }

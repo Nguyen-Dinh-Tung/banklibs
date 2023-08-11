@@ -210,9 +210,11 @@ export class AuthService {
         user[key] = data[key];
       }
     });
+
     if (data.password) {
-      user.password = bcrypt.hashSync(data.password, user.salt);
+      user.password = bcrypt.hashSync(data.password, 10);
     }
+
     await this.userRepo.update(
       { id: user.id },
       { ...user, updatedAt: new Date().toISOString() },

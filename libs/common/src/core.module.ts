@@ -4,13 +4,20 @@ import { DatabaseOptions } from './database';
 import {
   HistoryBalanceEntity,
   JobEntity,
+  NotificationEntity,
+  OwnFeeEntity,
+  RoleEntity,
+  SystemFeeEntity,
   TransactionEntity,
+  UserAdminEntity,
   UserBalanceEntity,
   UserEntity,
   UserVerificationEntity,
 } from './entities';
 import { ConfigModule } from '@nestjs/config';
 import { RefundEntity } from './entities/refund.entity';
+import { SystemFeeApplyUserEntity } from './entities/system-fee-apply-user.entity';
+import { NotificationUserEntity } from './entities/notification-user.entity';
 @Module({})
 @Global()
 export class CoreModule {
@@ -35,6 +42,11 @@ export class CoreModule {
           UserBalanceEntity,
           TransactionEntity,
           RefundEntity,
+          SystemFeeEntity,
+          SystemFeeApplyUserEntity,
+          NotificationEntity,
+          NotificationUserEntity,
+          OwnFeeEntity,
         ]),
       ],
       exports: [TypeOrmModule],

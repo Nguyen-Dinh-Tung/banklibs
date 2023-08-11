@@ -10,6 +10,7 @@ import { JobModule } from './job/job.module';
 import { AdminLogModule } from './admin-log/admin-log.module';
 import { InititalModule } from './initial/initial.module';
 import { UserAdminModule } from './user-admin/user-admin.module';
+import { FeeModule } from './fee/fee.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserAdminModule } from './user-admin/user-admin.module';
     JobModule,
     AdminLogModule,
     UserAdminModule,
+    FeeModule,
     JwtModuleDynamic.registerAsync(EnvVariable.SECRET_KEY),
   ],
   controllers: [AdminController],
