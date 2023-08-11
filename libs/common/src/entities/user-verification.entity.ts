@@ -20,7 +20,7 @@ export class UserVerificationEntity extends IdDateEntity {
   kycStatus: KycStatusUserEnum;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @NullColumn({ length: 255 })

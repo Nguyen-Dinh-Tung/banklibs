@@ -1,5 +1,5 @@
 export interface EmailContentInterface {
-  content: string;
+  content?: string;
 
   address: string;
 

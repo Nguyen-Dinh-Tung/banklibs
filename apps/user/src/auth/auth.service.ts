@@ -13,9 +13,16 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import {
   KycStatusUserEnum,
+  TypeOtpEmailEnum,
   TypeVerificationEnum,
-} from '@app/common/enum/database.enum';
+} from '@app/common';
 import { JwtInterface } from '@app/common';
+import { OtpService } from '../otp/otp.service';
+import {
+  ForgotPasswordDto,
+  ChangePasswordDto,
+} from './dto/forgot-password.dto';
+import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +37,8 @@ export class AuthService {
     private readonly jobRepo: Repository<JobEntity>,
 
     private readonly jwtService: JwtService,
+
+    private readonly otpService: OtpService,
   ) {}
 
   async register(data: RegisterUserDto) {
@@ -85,8 +94,8 @@ export class AuthService {
       throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
     }
 
-    if (!bcrypt.compare(data.password, checkUser.password)) {
-      throw new AppHttpBadRequest(UserError.ERROR_PASSWORD_FAILT);
+    if (!bcrypt.compareSync(data.password, checkUser.password)) {
+      throw new AppHttpBadRequest(UserError.ERROR_PASSWORD_FAIL);
     }
 
     return {
@@ -107,5 +116,83 @@ export class AuthService {
 
   async getMe(user: UserEntity) {
     return { docs: user };
+  }
+
+  async forgotPassword(data: ForgotPasswordDto) {
+    const checkUser = await this.userRepo.findOne({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (!checkUser) {
+      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+    }
+    return await this.otpService.forgotPassword(checkUser);
+  }
+
+  async getPassword(data: ChangePasswordDto) {
+    const checkUser = await this.userRepo.findOne({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (!checkUser) {
+      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+    }
+
+    await this.otpService.verifyOtpEmail(
+      data.code,
+      checkUser,
+      TypeOtpEmailEnum.FORGOT_PASSWORD,
+    );
+
+    await this.userRepo.update(
+      { id: checkUser.id },
+      { password: data.password },
+    );
+
+    return {
+      success: true,
+    };
+  }
+
+  async update(data: UpdateMyProfileDto, user: UserEntity) {
+    if (data.idJob) {
+      const checkJob = await this.jobRepo.findOne({
+        where: {
+          id: data.idJob,
+        },
+      });
+
+      if (!checkJob) {
+        throw new AppHttpBadRequest(JobErrors.ERROR_JOB_NOT_FOUND);
+      }
+      user['job'] = checkJob;
+    }
+
+    delete data.idJob;
+
+    Object.keys(data).some((key) => {
+      if (data[key]) {
+        if (key === 'country') {
+          user[key] = String(data.country);
+          return;
+        }
+        user[key] = data[key];
+      }
+    });
+    if (data.password) {
+      user.password = bcrypt.hashSync(data.password, user.salt);
+    }
+    await this.userRepo.update(
+      { id: user.id },
+      { ...user, updatedAt: new Date().toISOString() },
+    );
+
+    return {
+      success: true,
+    };
   }
 }

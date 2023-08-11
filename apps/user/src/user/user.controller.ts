@@ -17,5 +17,7 @@ export class UserController {
   }
 
   @Post('verify-email')
-  async verification(@Body() data: VerifyEmailDto, @User() user: UserEntity) {}
+  async verifyEmail(@Body() data: VerifyEmailDto, @User() user: UserEntity) {
+    return await this.userSerive.verifyEmail(data, user);
+  }
 }

@@ -2,11 +2,8 @@ import { Module } from '@nestjs/common';
 import { UploaderController } from './uploader.controller';
 import { UploaderService } from './uploader.service';
 import { ConfigModule } from '@nestjs/config';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { MulterModule } from '@nestjs/platform-express';
 import { EnvVariable, ServeStaticDynamic } from '@app/common';
-console.log(join('.', '/uploads/user/'), `join('.', '/uploads/user/')`);
 
 @Module({
   imports: [

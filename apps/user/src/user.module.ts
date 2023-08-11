@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { CoreModule, EnvVariable, JwtModuleDynamic } from '@app/common';
+import {
+  ApiConsumesInterceptor,
+  CoreModule,
+  EnvVariable,
+  JwtModuleDynamic,
+} from '@app/common';
 import { AuthModule } from './auth/auth.module';
 import { JobModule } from './job/job.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { UserModule as UsersModule } from './user/user.module';
 import { OtpModule } from './otp/otp.module';

@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import {
   IdDateDeleteEntity,
   IsActiveTrueColumn,
@@ -6,10 +6,10 @@ import {
 } from '../database';
 import { TypeOtpEmailEnum } from '../enum/database.enum';
 import { UserEntity } from './user.enitty';
-
+import * as bcrypt from 'bcrypt';
 @Entity('otp_email')
 export class OtpEmailEntity extends IdDateDeleteEntity {
-  @NotNullColum({ length: 6 })
+  @NotNullColum({ type: 'varchar' })
   code: string;
 
   @IsActiveTrueColumn()
@@ -34,4 +34,13 @@ export class OtpEmailEntity extends IdDateDeleteEntity {
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
   user: UserEntity;
+
+  @Column()
+  salt: string;
+
+  @BeforeInsert()
+  beforeInsert() {
+    this.salt = bcrypt.genSaltSync(10);
+    this.code = bcrypt.hashSync(this.code, this.salt);
+  }
 }

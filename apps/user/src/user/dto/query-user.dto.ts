@@ -1,6 +1,23 @@
-import { JobEntity, Paginate, QueryDate, UserEntity } from '@app/common';
+import {
+  JobEntity,
+  Paginate,
+  QueryDate,
+  UserEntity,
+  verificationLevel,
+} from '@app/common';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional } from 'class-validator';
 
-export class QueryUserDto extends QueryDate {}
+export class QueryUserDto extends QueryDate {
+  @IsOptional()
+  @ApiPropertyOptional({ enum: verificationLevel })
+  @IsEnum(verificationLevel)
+  verificationLevel: verificationLevel;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  keyword: string;
+}
 
 export class UserInforDto {
   id: string;
