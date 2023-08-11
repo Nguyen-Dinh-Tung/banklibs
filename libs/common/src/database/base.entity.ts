@@ -13,7 +13,7 @@ export class DateEntity {
   updatedAt: Date;
 }
 
-export class DeleteEntity {
+export class DeleteEntity extends DateEntity {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: Date;
 }
@@ -23,7 +23,7 @@ export class IdDateEntity extends DateEntity {
   id: string;
 }
 
-export class IdDateDeleteEntity extends DateEntity {
+export class IdDateDeleteEntity extends DeleteEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 }

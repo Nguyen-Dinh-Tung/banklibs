@@ -7,6 +7,7 @@ import { JobModule } from './job/job.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { UserModule as UsersModule } from './user/user.module';
+import { OtpModule } from './otp/otp.module';
 @Module({
   imports: [
     CoreModule.forRoot(),
@@ -14,6 +15,7 @@ import { UserModule as UsersModule } from './user/user.module';
     AuthModule,
     JobModule,
     UsersModule,
+    OtpModule.Register(),
   ],
   controllers: [UserController],
   providers: [UserService, { provide: APP_GUARD, useClass: AuthGuard }],
