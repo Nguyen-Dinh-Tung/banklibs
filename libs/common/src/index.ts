@@ -8,3 +8,4 @@ export * from './constants';
 export * from './helpers';
 export * from './entities';
 export * from './interfaces';
+export * from './service';

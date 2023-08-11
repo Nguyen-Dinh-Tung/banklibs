@@ -1,0 +1,3 @@
+export enum OtpErrors {
+  ERROR_MAX_GENERATE_OTP = 'ERROR_MAX_GENERATE_OTP',
+}

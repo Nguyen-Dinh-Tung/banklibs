@@ -1,7 +1,9 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UserService } from './user.service';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { User, UserEntity } from '@app/common';
 
 @Controller('user')
 @ApiTags('User')
@@ -13,4 +15,7 @@ export class UserController {
   async findAll(@Query() query: QueryUserDto) {
     return await this.userSerive.findAll(query);
   }
+
+  @Post('verify-email')
+  async verification(@Body() data: VerifyEmailDto, @User() user: UserEntity) {}
 }

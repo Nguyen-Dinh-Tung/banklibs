@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import {
   IdDateDeleteEntity,
   IsActiveTrueColumn,
@@ -8,7 +8,7 @@ import { TypeOtpEmailEnum } from '../enum/database.enum';
 import { UserEntity } from './user.enitty';
 
 @Entity('otp_email')
-export class OtpEmail extends IdDateDeleteEntity {
+export class OtpEmailEntity extends IdDateDeleteEntity {
   @NotNullColum({ length: 6 })
   code: string;
 
@@ -22,11 +22,14 @@ export class OtpEmail extends IdDateDeleteEntity {
   })
   type: TypeOtpEmailEnum;
 
-  @Column()
-  expires: number;
+  @NotNullColum({ type: 'bigint' })
+  expires: bigint;
 
-  @Column()
+  @NotNullColum({ default: 1 })
   times: number;
+
+  @NotNullColum({ default: false })
+  used: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
