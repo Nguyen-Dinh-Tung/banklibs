@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { QueryUserDto, UserInfor } from './dto/query-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PageMetaDto, UserEntity, UserVerificationEntity } from '@app/common';
+import {
+  PageMetaDto,
+  UserEntity,
+  UserVerificationEntity,
+  otpEmailRandom,
+} from '@app/common';
 import { Repository } from 'typeorm';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { OtpService } from '../otp/otp.service';
 import {
   KycStatusUserEnum,
+  TypeOtpEmailEnum,
   TypeVerificationEnum,
 } from '@app/common/enum/database.enum';
 import { AppHttpBadRequest, VerificationError } from '@app/exceptions';
@@ -42,6 +48,28 @@ export class UserService {
       });
     }
 
+    if (query.verificationLevel) {
+      queryBuilder
+        .leftJoin(
+          UserVerificationEntity,
+          'verification',
+          'verification.user_id = user.id',
+        )
+        .andWhere('verification.type = :verificationLevel', {
+          verificationLevel: query.verificationLevel,
+        })
+        .andWhere('verification.kycStatus = :kycStatus', {
+          kycStatus: KycStatusUserEnum.ACCEPT,
+        });
+    }
+
+    if (query.keyword) {
+      queryBuilder.andWhere(
+        '(user.fullname LIKE :keyword or user.email LIKE :keyword or user.phone LIKE :keyword)',
+        { keyword: `%${query.keyword}%` },
+      );
+    }
+
     const [data, total] = await queryBuilder.getManyAndCount();
 
     return new UserInfor(
@@ -61,15 +89,17 @@ export class UserService {
       },
     });
 
-    console.log(checkVerifyEmail, 'checkVerifyEmail');
-
     if (checkVerifyEmail) {
       throw new AppHttpBadRequest(
         VerificationError.ERORR_USER_WAS_VERIFY_EMAIL,
       );
     }
 
-    await this.otpService.verifyOtpEmail(data.code, user);
+    await this.otpService.verifyOtpEmail(
+      data.code,
+      user,
+      TypeOtpEmailEnum.VERIFICATION,
+    );
 
     await this.userVerificationRepo.insert(
       this.userVerificationRepo.create({
@@ -81,5 +111,9 @@ export class UserService {
     );
 
     return { success: true };
+  }
+
+  async forgotPassword(user: UserEntity) {
+    return await this.otpService.forgotPassword(user);
   }
 }

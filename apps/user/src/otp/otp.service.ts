@@ -5,6 +5,7 @@ import {
   otpEmailContent,
   otpEmailRandom,
   otpEmailTitle,
+  titleOtpForgotPassword,
 } from '@app/common';
 import { TypeOtpEmailEnum } from '@app/common/enum/database.enum';
 import { AppHttpBadRequest, OtpErrors } from '@app/exceptions';
@@ -20,13 +21,14 @@ export class OtpService {
     private readonly otpEmailRepo: Repository<OtpEmailEntity>,
   ) {}
 
-  async getEmailOtp(user: UserEntity) {
+  async getEmailOtp(user: UserEntity, type: TypeOtpEmailEnum, title: string) {
     const checkExistOtp = await this.otpEmailRepo.findOne({
       where: {
         user: {
           id: user.id,
         },
         isActive: true,
+        type: type,
       },
     });
 
@@ -37,29 +39,34 @@ export class OtpService {
         if (checkExistOtp.times >= +process.env.MAX_GENERATE_OTP_EMAIL) {
           throw new AppHttpBadRequest(OtpErrors.ERROR_MAX_GENERATE_OTP);
         }
-        await this.newOtpEmail(otp, user, checkExistOtp.times + 1);
+        await this.newOtpEmail(otp, user, checkExistOtp.times + 1, type);
         await this.otpEmailRepo.softDelete({ id: checkExistOtp.id });
       } else {
-        await this.newOtpEmail(otp, user, checkExistOtp.times + 1);
+        await this.newOtpEmail(otp, user, checkExistOtp.times + 1, type);
         await this.otpEmailRepo.softDelete({ id: checkExistOtp.id });
       }
     } else {
-      await this.newOtpEmail(otp, user, 1);
+      await this.newOtpEmail(otp, user, 1, type);
     }
 
     await this.emailOtpService.send({
       address: user.email,
       content: otpEmailContent + otp,
-      title: otpEmailTitle,
+      title: title,
     });
 
     return { success: true };
   }
 
-  async newOtpEmail(otp: string, user: UserEntity, times: number) {
+  async newOtpEmail(
+    otp: string,
+    user: UserEntity,
+    times: number,
+    type: TypeOtpEmailEnum,
+  ) {
     await this.otpEmailRepo.insert(
       this.otpEmailRepo.create({
-        type: TypeOtpEmailEnum.VERIFICATION,
+        type: type,
         code: otp,
         times: times,
         user: user,
@@ -70,11 +77,12 @@ export class OtpService {
     );
   }
 
-  async verifyOtpEmail(code: string, user: UserEntity) {
+  async verifyOtpEmail(code: string, user: UserEntity, type: TypeOtpEmailEnum) {
     const checkOtp = await this.otpEmailRepo.findOne({
       where: {
         isActive: true,
         deletedAt: null,
+        type: type,
         user: {
           id: user.id,
         },
@@ -97,6 +105,19 @@ export class OtpService {
       user: {
         id: user.id,
       },
+      type: type,
     });
+  }
+
+  async forgotPassword(user: UserEntity) {
+    await this.getEmailOtp(
+      user,
+      TypeOtpEmailEnum.FORGOT_PASSWORD,
+      titleOtpForgotPassword,
+    );
+
+    return {
+      success: true,
+    };
   }
 }

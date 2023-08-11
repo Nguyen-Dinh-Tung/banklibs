@@ -13,9 +13,12 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import {
   KycStatusUserEnum,
+  TypeOtpEmailEnum,
   TypeVerificationEnum,
 } from '@app/common/enum/database.enum';
 import { JwtInterface } from '@app/common';
+import { OtpService } from '../otp/otp.service';
+import { ForgotPasswordDto, GetPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +33,8 @@ export class AuthService {
     private readonly jobRepo: Repository<JobEntity>,
 
     private readonly jwtService: JwtService,
+
+    private readonly otpService: OtpService,
   ) {}
 
   async register(data: RegisterUserDto) {
@@ -107,5 +112,45 @@ export class AuthService {
 
   async getMe(user: UserEntity) {
     return { docs: user };
+  }
+
+  async forgotPassword(data: ForgotPasswordDto) {
+    const checkUser = await this.userRepo.findOne({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (!checkUser) {
+      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+    }
+    return await this.otpService.forgotPassword(checkUser);
+  }
+
+  async getPassword(data: GetPasswordDto) {
+    const checkUser = await this.userRepo.findOne({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (!checkUser) {
+      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+    }
+
+    await this.otpService.verifyOtpEmail(
+      data.code,
+      checkUser,
+      TypeOtpEmailEnum.FORGOT_PASSWORD,
+    );
+
+    await this.userRepo.update(
+      { id: checkUser.id },
+      { password: data.password },
+    );
+
+    return {
+      success: true,
+    };
   }
 }

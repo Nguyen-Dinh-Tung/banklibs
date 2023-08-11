@@ -4,6 +4,7 @@ import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { Public, User, UserEntity } from '@app/common';
 import { LoginUserDto } from './dto/login-user.dto';
+import { ForgotPasswordDto, GetPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 @ApiBearerAuth()
@@ -28,5 +29,17 @@ export class AuthController {
   @Get('me')
   async getMe(@User() user: UserEntity) {
     return await this.authService.getMe(user);
+  }
+
+  @Get('forgot-password')
+  @Public()
+  async forgotPassword(@Body() data: ForgotPasswordDto) {
+    return await this.authService.forgotPassword(data);
+  }
+
+  @Post('forgot-password')
+  @Public()
+  async getPassword(@Body() data: GetPasswordDto) {
+    return await this.authService.getPassword(data);
   }
 }

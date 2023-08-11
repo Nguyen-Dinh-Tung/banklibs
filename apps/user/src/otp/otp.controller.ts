@@ -1,7 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { OtpService } from './otp.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { User, UserEntity } from '@app/common';
+import { User, UserEntity, otpEmailTitle } from '@app/common';
+import { TypeOtpEmailEnum } from '@app/common/enum/database.enum';
 
 @Controller('otp')
 @ApiTags('Otp')
@@ -11,6 +12,10 @@ export class OtpController {
 
   @Get('verify-email')
   async getEmailOtp(@User() user: UserEntity) {
-    return await this.otpService.getEmailOtp(user);
+    return await this.otpService.getEmailOtp(
+      user,
+      TypeOtpEmailEnum.VERIFICATION,
+      otpEmailTitle,
+    );
   }
 }
