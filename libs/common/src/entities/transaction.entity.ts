@@ -39,13 +39,13 @@ export class TransactionEntity extends IdDateEntity {
   code: string;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { nullable: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'creator_id' })
   creator: UserEntity;
 
   @Column({ name: 'system_handle', default: false })
   systemHandle: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'receiver_id' })
   receiver: UserEntity;
 }

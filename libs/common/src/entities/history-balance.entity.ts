@@ -1,6 +1,8 @@
 import { UserBalanceEntity } from './user-balance.entity';
-import { Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { IdDateEntity, NotNullColum } from '../database';
+import { TransactionEntity } from './transaction.entity';
+import { RefundEntity } from './refund.entity';
 
 @Entity('history_balance')
 export class HistoryBalanceEntity extends IdDateEntity {
@@ -16,4 +18,14 @@ export class HistoryBalanceEntity extends IdDateEntity {
 
   @NotNullColum({ name: 'type_transaction' })
   typeTransaction: string;
+
+  @OneToOne(() => TransactionEntity, (transaction) => transaction.id, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'transaction_id' })
+  transaction: TransactionEntity;
+
+  @OneToOne(() => RefundEntity, (refund) => refund.id, { nullable: true })
+  @JoinColumn({ name: 'refund_id' })
+  refund: RefundEntity;
 }

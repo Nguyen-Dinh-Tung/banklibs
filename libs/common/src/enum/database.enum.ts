@@ -289,3 +289,13 @@ export enum CountryCode {
   Zambia = 'ZM',
   Zimbabwe = 'ZW',
 }
+
+export enum StatusRefundEnum {
+  PENDING = 'pending',
+  REJECT = 'reject',
+  ACCEPT = 'accept',
+}
+
+export enum TypeSystemFeeEnum {
+  CONSTRUCT_SYSTEM = 'construct_system',
+}

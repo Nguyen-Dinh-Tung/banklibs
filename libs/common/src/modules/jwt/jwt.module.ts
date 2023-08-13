@@ -1,7 +1,8 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 
+@Global()
 @Module({})
 export class JwtModuleDynamic {
   static registerAsync(envVariable: string): DynamicModule {
@@ -20,8 +21,8 @@ export class JwtModuleDynamic {
           }),
         }),
       ],
-      providers: [JwtService],
-      exports: [JwtService],
+      providers: [],
+      exports: [JwtModule],
     };
   }
 }

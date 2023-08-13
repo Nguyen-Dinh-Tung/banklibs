@@ -1,5 +1,6 @@
 import {
   JobEntity,
+  UserBalanceEntity,
   UserEntity,
   UserVerificationEntity,
 } from '@app/common/entities';
@@ -15,6 +16,7 @@ import {
   KycStatusUserEnum,
   TypeOtpEmailEnum,
   TypeVerificationEnum,
+  generateRandomString,
 } from '@app/common';
 import { JwtInterface } from '@app/common';
 import { OtpService } from '../otp/otp.service';
@@ -23,7 +25,6 @@ import {
   ChangePasswordDto,
 } from './dto/forgot-password.dto';
 import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -35,6 +36,9 @@ export class AuthService {
 
     @InjectRepository(JobEntity)
     private readonly jobRepo: Repository<JobEntity>,
+
+    @InjectRepository(UserBalanceEntity)
+    private readonly userBanlance: Repository<UserBalanceEntity>,
 
     private readonly jwtService: JwtService,
 
@@ -62,13 +66,36 @@ export class AuthService {
 
     delete data.idJob;
 
-    const newUser = this.userRepo.create({
+    const newUser = await this.userRepo.save({
       ...data,
       job: checkJob,
+      password: bcrypt.hashSync(data.password, 10),
       createdAt: new Date().toISOString(),
     });
 
-    await this.userRepo.insert(newUser);
+    let bankNumber = generateRandomString(+process.env.LENGTH_USER_BANK_NUMBER);
+
+    let flag = false;
+
+    while (flag === true) {
+      const checkBankNumber = await this.userBanlance.findOne({
+        where: {
+          bankNumber: bankNumber,
+        },
+      });
+
+      if (!checkBankNumber) {
+        flag = true;
+      }
+
+      bankNumber = generateRandomString(+process.env.LENGTH_USER_BANK_NUMBER);
+    }
+
+    await this.userBanlance.insert({
+      user: newUser,
+      bankNumber: bankNumber,
+      createdAt: new Date().toISOString(),
+    });
 
     await this.userVerificationRepo.insert(
       this.userVerificationRepo.create({
@@ -109,9 +136,7 @@ export class AuthService {
   }
 
   genToken(data: JwtInterface) {
-    return this.jwtService.sign(data, {
-      secret: process.env.SECRET_KEY,
-    });
+    return this.jwtService.sign(data);
   }
 
   async getMe(user: UserEntity) {
@@ -183,9 +208,11 @@ export class AuthService {
         user[key] = data[key];
       }
     });
+
     if (data.password) {
-      user.password = bcrypt.hashSync(data.password, user.salt);
+      user.password = bcrypt.hashSync(data.password, 10);
     }
+
     await this.userRepo.update(
       { id: user.id },
       { ...user, updatedAt: new Date().toISOString() },
