@@ -12,8 +12,8 @@ import { TransactionModule } from './transaction/transacion.module';
 import { UserBalanceModule } from './user-balance/user-balance.module';
 @Module({
   imports: [
-    CoreModule.forRoot(),
     JwtModuleDynamic.registerAsync(EnvVariable.SECRET_KEY),
+    CoreModule.forRoot(),
     AuthModule,
     JobModule,
     UsersModule,

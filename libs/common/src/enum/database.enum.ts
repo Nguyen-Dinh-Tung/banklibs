@@ -295,3 +295,7 @@ export enum StatusRefundEnum {
   REJECT = 'reject',
   ACCEPT = 'accept',
 }
+
+export enum TypeSystemFeeEnum {
+  CONSTRUCT_SYSTEM = 'construct_system',
+}

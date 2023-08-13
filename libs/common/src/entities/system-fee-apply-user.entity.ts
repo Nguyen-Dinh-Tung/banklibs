@@ -1,5 +1,5 @@
 import { Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { IdDateDeleteEntity } from '../database';
+import { IdDateDeleteEntity, IsActiveFalseColumn } from '../database';
 import { UserEntity } from './user.enitty';
 import { SystemFeeEntity } from './system-fee.entity';
 
@@ -8,6 +8,9 @@ export class SystemFeeApplyUserEntity extends IdDateDeleteEntity {
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn()
   user: UserEntity;
+
+  @IsActiveFalseColumn()
+  isActive: boolean;
 
   @ManyToOne(() => SystemFeeEntity, (systemFee) => systemFee.id)
   @JoinColumn({ name: 'system_fee' })

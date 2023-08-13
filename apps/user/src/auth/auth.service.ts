@@ -136,9 +136,7 @@ export class AuthService {
   }
 
   genToken(data: JwtInterface) {
-    return this.jwtService.sign(data, {
-      secret: process.env.SECRET_KEY,
-    });
+    return this.jwtService.sign(data);
   }
 
   async getMe(user: UserEntity) {

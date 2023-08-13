@@ -3,7 +3,7 @@ import { DateColumn, IdDateDeleteEntity, NotNullColum } from '../database';
 
 @Entity('system_fee')
 export class SystemFeeEntity extends IdDateDeleteEntity {
-  @NotNullColum()
+  @NotNullColum({ default: false })
   apply: boolean;
 
   @NotNullColum()
@@ -14,4 +14,7 @@ export class SystemFeeEntity extends IdDateDeleteEntity {
 
   @DateColumn({ name: 'start_date' })
   startDate: Date;
+
+  @NotNullColum({})
+  type: string;
 }
