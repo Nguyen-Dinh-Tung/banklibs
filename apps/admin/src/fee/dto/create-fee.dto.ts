@@ -1,6 +1,6 @@
 import { TypeSystemFeeEnum } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, Max, Min } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, Max, Min } from 'class-validator';
 
 export class CreateFeeSystemDto {
   @IsNotEmpty()
@@ -10,11 +10,13 @@ export class CreateFeeSystemDto {
 
   @IsNotEmpty()
   @ApiProperty()
-  endDate: Date;
+  @IsDateString()
+  endDate: string;
 
   @IsNotEmpty()
   @ApiProperty()
-  startDate: Date;
+  @IsDateString()
+  startDate: string;
 
   @IsNotEmpty()
   @ApiProperty()

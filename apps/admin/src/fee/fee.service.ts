@@ -1,17 +1,21 @@
 import {
   AppEntityEnum,
   AppTypeLogEnum,
+  HistoryOwnFeeSettingEntity,
+  HistorySystemFeeSettingEntity,
   OwnFeeEntity,
   PageMetaDto,
   SystemFeeApplyUserEntity,
   SystemFeeEntity,
+  TransactionEntity,
   UserAdminEntity,
   UserEntity,
+  compareStartAndEndDateWithCurrentDate,
 } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { CreateFeeSystemDto } from './dto/create-fee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, LessThan, MoreThan, Repository } from 'typeorm';
+import { In, MoreThan, Repository } from 'typeorm';
 import { AdminLogService } from '../admin-log/admin-log.service';
 import {
   QuerySystemfeeDto,
@@ -23,6 +27,19 @@ import { AppHttpBadRequest, FeeErrors, UserError } from '@app/exceptions';
 import { SystemFeeSettingDto } from './dto/system-fee-setting.dto';
 import { isAfter } from 'date-fns';
 import { CreateFeeOwnDto } from './dto/create-fee-own.dto';
+import {
+  FeeUserInfor,
+  FeeUserInforDto,
+  QueryFeeUserDetailDto,
+} from './dto/query-fee-user-detail.dto';
+import {
+  OwnFeeInfor,
+  OwnFeeInforDto,
+  QueryFeeUserSortByEnum,
+  QueryOwnFeeDto,
+} from './dto/query-system-fee-user.dto';
+import { ApplyFeeOwnDto } from './dto/apply-fee-own.dto';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class FeeService {
   constructor(
@@ -35,16 +52,39 @@ export class FeeService {
     @InjectRepository(SystemFeeApplyUserEntity)
     private readonly systemFeeApplyUserRepo: Repository<SystemFeeApplyUserEntity>,
 
+    @InjectRepository(HistoryOwnFeeSettingEntity)
+    private readonly historyOwnFeeSettingRepo: Repository<HistoryOwnFeeSettingEntity>,
+
+    @InjectRepository(HistorySystemFeeSettingEntity)
+    private readonly historySystemFeeSetting: Repository<HistorySystemFeeSettingEntity>,
+
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
 
     private readonly adminLogService: AdminLogService,
+
+    private readonly userService: UserService,
   ) {}
 
   async createFeeSystem(user: UserAdminEntity, data: CreateFeeSystemDto) {
+    compareStartAndEndDateWithCurrentDate(
+      new Date(data.startDate),
+      new Date(data.endDate),
+    );
+
     const newFeeSystem = await this.systemFeeRepo.save(
       this.systemFeeRepo.create({
         ...data,
+        createdAt: new Date().toISOString(),
+      }),
+    );
+
+    await this.historySystemFeeSetting.insert(
+      this.historySystemFeeSetting.create({
+        newFee: data.percent,
+        previousFee: 0,
+        totalFeeCollected: BigInt(0),
+        systemFee: newFeeSystem,
         createdAt: new Date().toISOString(),
       }),
     );
@@ -125,7 +165,7 @@ export class FeeService {
     });
 
     if (checkSystemFeeCurrent) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_EXIST_SYSTEM_FEE_CURRENT);
+      throw new AppHttpBadRequest(FeeErrors.ERROR_EXISTED_SYSTEM_FEE_CURRENT);
     }
 
     await this.systemFeeRepo.update({ id: checkSystemFee.id }, { apply: true });
@@ -214,5 +254,183 @@ export class FeeService {
     };
   }
 
-  async createFeeOwn(user: UserAdminEntity, data: CreateFeeOwnDto) {}
+  async createFeeOwn(user: UserAdminEntity, data: CreateFeeOwnDto) {
+    compareStartAndEndDateWithCurrentDate(
+      new Date(data.startDate),
+      new Date(data.endDate),
+    );
+
+    const checkUser = await this.userService.findOneOrThrowNotFound({
+      id: data.id,
+    });
+
+    const newOwnFee = await this.ownFeeRepo.save(
+      this.ownFeeRepo.create({
+        createdAt: new Date().toISOString(),
+        creator: user,
+        percent: data.percent,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        apply: false,
+        user: checkUser,
+      }),
+    );
+
+    await this.historyOwnFeeSettingRepo.save(
+      this.historyOwnFeeSettingRepo.create({
+        newFee: data.percent,
+        createdAt: new Date().toISOString(),
+        totalFeeCollected: BigInt(0),
+        previousFee: 0,
+        oldEndDate: data.endDate,
+        oldStartDate: data.startDate,
+        ownFee: newOwnFee,
+      }),
+    );
+
+    await this.adminLogService.createNewAdminLog({
+      data: data,
+      entity: AppEntityEnum.FEE_OWN,
+      IdEntity: newOwnFee.id,
+      type: AppTypeLogEnum.CREATE,
+      user: user,
+    });
+
+    return {
+      success: true,
+    };
+  }
+
+  async settingFeeOwn(data: ApplyFeeOwnDto, user: UserAdminEntity) {
+    await this.userService.findOneOrThrowNotFound({
+      id: data.idUser,
+    });
+
+    const checkOwnFee = await this.ownFeeRepo.findOne({
+      where: {
+        id: data.idFeeOwn,
+      },
+    });
+
+    if (!checkOwnFee) {
+      throw new AppHttpBadRequest(FeeErrors.ERROR_OWN_FEE_NOT_FOUND);
+    }
+
+    const checkCurrentOwnFee = await this.ownFeeRepo.findOne({
+      where: {
+        apply: true,
+        endDate: MoreThan(new Date()),
+      },
+    });
+
+    if (checkCurrentOwnFee) {
+      throw new AppHttpBadRequest(FeeErrors.ERROR_EXISTED_OWN_FEE_USING);
+    }
+
+    compareStartAndEndDateWithCurrentDate(
+      new Date(checkOwnFee.startDate),
+      new Date(checkOwnFee.endDate),
+    );
+
+    await this.ownFeeRepo.update(
+      { id: checkOwnFee.id },
+      { apply: true, updatedAt: new Date().toISOString() },
+    );
+
+    await this.adminLogService.createNewAdminLog({
+      data: data,
+      entity: AppEntityEnum.FEE_OWN,
+      IdEntity: checkOwnFee.id,
+      type: AppTypeLogEnum.UPDATE,
+      user: user,
+    });
+
+    return {
+      success: true,
+    };
+  }
+
+  async getFeeUserDetail(query: QueryFeeUserDetailDto) {
+    const checkSystemFee = await this.systemFeeRepo
+      .createQueryBuilder('systemFee')
+      .leftJoin(
+        SystemFeeApplyUserEntity,
+        'feeApply',
+        'feeApply.system_fee_id = systemFee.id',
+      )
+      .leftJoin('feeApply.user', 'user')
+      .where('systemFee.apply = :apply', { apply: true })
+      .andWhere('user.id = :idUser', { idUser: query.idUser })
+      .getOne();
+
+    const checkOwnFee = await this.ownFeeRepo.find({
+      where: {
+        user: {
+          id: query.idUser,
+        },
+      },
+    });
+    const data = [...checkOwnFee, checkSystemFee];
+    return new FeeUserInfor(
+      data.length ? data.map((e) => new FeeUserInforDto(e)) : [],
+      new PageMetaDto({ ...query, total: data.length }),
+    );
+  }
+
+  async getFeeUser(query: QueryOwnFeeDto) {
+    const queryBuilder = this.ownFeeRepo
+      .createQueryBuilder('ownFee')
+      .offset(query.getSkip())
+      .limit(query.limit)
+      .leftJoin(
+        TransactionEntity,
+        'transaction',
+        'transaction.own_fee_id = ownFee.id',
+      )
+      .leftJoin('ownFee.user', 'user')
+      .select([
+        'ownFee.id as id',
+        'ownFee.percent as percent',
+        'ownFee.startDate as startDate',
+        'ownFee.endDate as endDate',
+        'ownFee.createdAt as createdAt',
+        'ownFee.updatedAt as updatedAt',
+        'ownFee.apply as apply',
+        'SUM(COALESCE(transaction.amountOwnFee,0)) as revenue',
+        'user.username as username',
+      ])
+      .groupBy('ownFee.id');
+
+    if (query.sortBy === QueryFeeUserSortByEnum.REVENUE) {
+      queryBuilder.orderBy('revenue', query.order);
+    } else {
+      queryBuilder.orderBy(`ownFee.${query.sortBy}`, query.order);
+    }
+
+    if (query.min) {
+      queryBuilder.andWhere('ownFee.percent >= :min', { min: query.min });
+    }
+
+    if (query.max) {
+      queryBuilder.andWhere('ownFee.percent <= :max', { max: query.max });
+    }
+
+    if (query.expires) {
+      queryBuilder.andWhere(
+        `ownFee.endDate > STR_TO_DATE(:now , "%Y-%m-%D %H-%i-%S-%f")`,
+        { now: new Date().toISOString() },
+      );
+    }
+
+    if (query.apply) {
+      queryBuilder.andWhere('ownFee.apply = :apply', { apply: query.apply });
+    }
+    const data = await queryBuilder.getRawMany();
+    const total = await queryBuilder.getCount();
+
+    return new OwnFeeInfor(
+      data.length ? data.map((e) => new OwnFeeInforDto(e)) : [],
+      new PageMetaDto({ ...query, total: total }),
+    );
+  }
 }

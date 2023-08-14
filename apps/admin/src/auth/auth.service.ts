@@ -32,8 +32,6 @@ export class AuthService {
   }
 
   genToken(data: JwtInterface) {
-    return this.jwtService.sign(data, {
-      secret: process.env[EnvVariable.SECRET_KEY],
-    });
+    return this.jwtService.sign(data);
   }
 }
