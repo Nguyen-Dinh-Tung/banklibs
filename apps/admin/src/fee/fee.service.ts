@@ -1,17 +1,20 @@
 import {
   AppEntityEnum,
   AppTypeLogEnum,
+  HistoryOwnFeeSettingEntity,
+  HistorySystemFeeSettingEntity,
   OwnFeeEntity,
   PageMetaDto,
   SystemFeeApplyUserEntity,
   SystemFeeEntity,
   UserAdminEntity,
   UserEntity,
+  compareStartAndEndDateWithCurrentDate,
 } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { CreateFeeSystemDto } from './dto/create-fee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, LessThan, MoreThan, Repository } from 'typeorm';
+import { In, MoreThan, Repository } from 'typeorm';
 import { AdminLogService } from '../admin-log/admin-log.service';
 import {
   QuerySystemfeeDto,
@@ -35,6 +38,12 @@ export class FeeService {
     @InjectRepository(SystemFeeApplyUserEntity)
     private readonly systemFeeApplyUserRepo: Repository<SystemFeeApplyUserEntity>,
 
+    @InjectRepository(HistoryOwnFeeSettingEntity)
+    private readonly historyOwnFeeSettingRepo: Repository<HistoryOwnFeeSettingEntity>,
+
+    @InjectRepository(HistorySystemFeeSettingEntity)
+    private readonly historySystemFeeSetting: Repository<HistorySystemFeeSettingEntity>,
+
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
 
@@ -42,9 +51,24 @@ export class FeeService {
   ) {}
 
   async createFeeSystem(user: UserAdminEntity, data: CreateFeeSystemDto) {
+    compareStartAndEndDateWithCurrentDate(
+      new Date(data.startDate),
+      new Date(data.endDate),
+    );
+
     const newFeeSystem = await this.systemFeeRepo.save(
       this.systemFeeRepo.create({
         ...data,
+        createdAt: new Date().toISOString(),
+      }),
+    );
+
+    await this.historySystemFeeSetting.insert(
+      this.historySystemFeeSetting.create({
+        newFee: data.percent,
+        previousFee: 0,
+        totalFeeCollected: BigInt(0),
+        systemFee: newFeeSystem,
         createdAt: new Date().toISOString(),
       }),
     );

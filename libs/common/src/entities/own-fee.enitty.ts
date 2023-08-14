@@ -1,6 +1,7 @@
 import { Entity, JoinColumn, OneToOne } from 'typeorm';
-import { IdDateEntity, NotNullColum } from '../database';
+import { DateColumn, IdDateEntity, NotNullColum } from '../database';
 import { UserEntity } from './user.enitty';
+import { UserAdminEntity } from './user-admins.entity';
 
 @Entity('own_fee')
 export class OwnFeeEntity extends IdDateEntity {
@@ -13,4 +14,14 @@ export class OwnFeeEntity extends IdDateEntity {
 
   @NotNullColum({ default: true })
   apply: boolean;
+
+  @DateColumn({ name: 'end_date', nullable: false })
+  endDate: Date;
+
+  @DateColumn({ name: 'start_date', nullable: false })
+  startDate: Date;
+
+  @OneToOne(() => UserAdminEntity, (user) => user.id)
+  @JoinColumn()
+  creator: UserAdminEntity;
 }

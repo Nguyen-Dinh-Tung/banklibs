@@ -14,3 +14,5 @@ export * from './job.entity';
 export * from './user-admins.entity';
 export * from './user-balance.entity';
 export * from './system-fee-apply-user.entity';
+export * from './history-own-fee-setting.entity';
+export * from './history-system-fee-setting.entityt';
