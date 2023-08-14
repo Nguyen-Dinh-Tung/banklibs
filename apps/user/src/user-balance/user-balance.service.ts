@@ -12,7 +12,7 @@ export class UserBalanceService {
     private readonly userBalanceRepo: Repository<UserBalanceEntity>,
   ) {}
 
-  async checkSurplusOrThrowError(id: string, payAmoun: bigint) {
+  async checkSurplusOrThrowError(id: string, payAmountReal: bigint) {
     const checkSurplus = await this.userBalanceRepo.findOne({
       where: {
         user: {
@@ -25,7 +25,7 @@ export class UserBalanceService {
       throw new AppHttpBadRequest(ServerErrors.ERROR_SERVER_INTERVAL);
     }
 
-    if (checkSurplus.surplus < payAmoun) {
+    if (checkSurplus.surplus < payAmountReal) {
       throw new AppHttpBadRequest(UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE);
     }
 
@@ -45,6 +45,7 @@ export class UserBalanceService {
     if (!checkReceiver) {
       throw new AppHttpBadRequest(UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND);
     }
+
     return checkReceiver;
   }
 }

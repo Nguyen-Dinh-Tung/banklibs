@@ -39,7 +39,7 @@ export class PageMeta {
 
 interface IPaginated<T> {
   docs: T[];
-  meta: PageMeta;
+  meta?: PageMeta;
 }
 export function Paginate<T>(classRef: Type<T>) {
   class Paginated implements IPaginated<T> {
@@ -47,9 +47,9 @@ export function Paginate<T>(classRef: Type<T>) {
     docs: T[];
 
     @ApiProperty({ type: () => PageMeta })
-    meta: PageMeta;
+    meta?: PageMeta;
 
-    constructor(docs: T[], meta: PageMeta) {
+    constructor(docs: T[], meta?: PageMeta) {
       this.docs = docs;
       this.meta = meta;
     }

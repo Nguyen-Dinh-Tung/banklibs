@@ -11,7 +11,7 @@ export class TransactionController {
   @Post()
   async createTransaction(
     @User() user: UserEntity,
-    data: CreateTransactionDto,
+    @Body() data: CreateTransactionDto,
   ) {
     return await this.transactionService.createTransaction(user, data);
   }
