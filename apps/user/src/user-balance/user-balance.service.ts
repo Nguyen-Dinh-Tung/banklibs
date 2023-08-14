@@ -1,15 +1,9 @@
-import { UserBalanceEntity, UserEntity } from '@app/common';
+import { UniqueFieldUserInterface, UserBalanceEntity } from '@app/common';
+import { AppHttpBadRequest, ServerErrors } from '@app/exceptions';
+import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CheckUserBalanceDto } from './dto/check-user-balance.dto';
-import {
-  AppHttpBadRequest,
-  AppHttpInternalServerException,
-  ServerErrors,
-} from '@app/exceptions';
-import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
-import { CheckReceiverDto, ReceiverDto } from './dto/check-receiver.dto';
 
 @Injectable()
 export class UserBalanceService {
@@ -18,34 +12,30 @@ export class UserBalanceService {
     private readonly userBalanceRepo: Repository<UserBalanceEntity>,
   ) {}
 
-  async checkBalance(user: UserEntity, data: CheckUserBalanceDto) {
-    const checkUserBalance = await this.userBalanceRepo.findOne({
+  async checkSurplusOrThrowError(id: string, payAmountReal: bigint) {
+    const checkSurplus = await this.userBalanceRepo.findOne({
       where: {
         user: {
-          id: user.id,
+          id: id,
         },
       },
     });
 
-    if (!checkUserBalance) {
-      throw new AppHttpInternalServerException(
-        ServerErrors.ERROR_SERVER_INTERVAL,
-      );
+    if (!checkSurplus) {
+      throw new AppHttpBadRequest(ServerErrors.ERROR_SERVER_INTERVAL);
     }
 
-    if (Number(checkUserBalance.surplus) < Number(data.payAmount)) {
+    if (checkSurplus.surplus < payAmountReal) {
       throw new AppHttpBadRequest(UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE);
     }
 
-    return {
-      success: true,
-    };
+    return true;
   }
 
-  async checkReceiver(data: CheckReceiverDto) {
+  async checkReceiver(bankNumber: string): Promise<UserBalanceEntity> {
     const checkReceiver = await this.userBalanceRepo.findOne({
       where: {
-        bankNumber: data.bankNumber,
+        bankNumber: bankNumber,
       },
       relations: {
         user: true,
@@ -56,8 +46,6 @@ export class UserBalanceService {
       throw new AppHttpBadRequest(UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND);
     }
 
-    return {
-      docs: new ReceiverDto(checkReceiver),
-    };
+    return checkReceiver;
   }
 }

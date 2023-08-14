@@ -53,6 +53,9 @@ export class TransactionEntity extends IdDateEntity {
   @Column({ name: 'system_handle', default: false })
   systemHandle: boolean;
 
+  @NotNullColum({ name: 'number_bank' })
+  bankNumber: string;
+
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'receiver_id' })
   receiver: UserEntity;

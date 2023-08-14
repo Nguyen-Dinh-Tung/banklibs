@@ -10,6 +10,7 @@ import { UserModule as UsersModule } from './user/user.module';
 import { OtpModule } from './otp/otp.module';
 import { TransactionModule } from './transaction/transacion.module';
 import { UserBalanceModule } from './user-balance/user-balance.module';
+import { FeeModule } from './fee/fee.module';
 @Module({
   imports: [
     JwtModuleDynamic.registerAsync(EnvVariable.SECRET_KEY),
@@ -20,6 +21,7 @@ import { UserBalanceModule } from './user-balance/user-balance.module';
     OtpModule.Register(),
     TransactionModule,
     UserBalanceModule,
+    FeeModule,
   ],
   controllers: [UserController],
   providers: [UserService, { provide: APP_GUARD, useClass: AuthGuard }],
