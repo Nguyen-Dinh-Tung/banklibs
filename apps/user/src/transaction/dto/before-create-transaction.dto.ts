@@ -1,17 +1,12 @@
-import { TypeTransactionEnum } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateTransactionDto {
-  @IsNotEmpty()
-  @ApiProperty({ enum: TypeTransactionEnum })
-  typeTransaction: TypeTransactionEnum;
-
+export class BeforeCreateTransactionDto {
   @IsNotEmpty()
   @ApiProperty()
   @Transform((data) => BigInt(data.value))
-  amountPay: bigint;
+  payAmount: bigint;
 
   @IsNotEmpty()
   @ApiProperty()

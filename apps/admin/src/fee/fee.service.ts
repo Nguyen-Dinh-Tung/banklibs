@@ -105,12 +105,29 @@ export class FeeService {
   async getSystemFee(query: QuerySystemfeeDto): Promise<SystemFeeInfor> {
     const queryBuilder = this.systemFeeRepo
       .createQueryBuilder('system')
-      .orderBy('system.createdAt', query.order)
       .offset(query.getSkip())
-      .limit(query.limit);
+      .limit(query.limit)
+      .leftJoin(
+        TransactionEntity,
+        'transaction',
+        'transaction.system_fee_id = system.id',
+      )
+      .groupBy(`system.id`)
+      .orderBy(
+        query.sortBy === 'revenue' ? 'revenue' : query.sortBy,
+        query.order,
+      );
 
     if (query.apply) {
       queryBuilder.andWhere('system.apply = :apply', { apply: query.apply });
+    }
+
+    if (query.min) {
+      queryBuilder.andWhere('system.percent >= :min', { min: query.min });
+    }
+
+    if (query.max) {
+      queryBuilder.andWhere('system.percent <= :max', { max: query.max });
     }
 
     if (query.expires) {
@@ -139,7 +156,20 @@ export class FeeService {
       );
     }
 
-    const [data, total] = await queryBuilder.getManyAndCount();
+    queryBuilder
+      .select([
+        'system.id as id',
+        'system.apply as apply',
+        'system.percent as percent',
+        'system.endDate  as endDate',
+        'system.startDate as startDate',
+        'system.type as type',
+        'system.createdAt as createdAt',
+        'system.updatedAt as updatedAt',
+      ])
+      .addSelect('SUM(COALESCE(transaction.amountSystemFee , 0)) as revenue');
+    const data = await queryBuilder.getRawMany();
+    const total = await queryBuilder.getCount();
 
     return new SystemFeeInfor(
       data.length ? data.map((e) => new SystemFeeInforDto(e)) : data,

@@ -1,14 +1,17 @@
-import { SystemFeeEntity } from './../../../../../libs/common/src/entities/system-fee.entity';
 import {
   Paginate,
   QueryDate,
+  SystemFeeEntity,
   TypeSystemFeeEnum,
   stringToBoolean,
 } from '@app/common';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional } from 'class-validator';
-
+import { Transform, Type } from 'class-transformer';
+import { IsEnum, IsOptional, Max, Min } from 'class-validator';
+export enum QuerySystemFeeEnum {
+  REVENUE = 'revenue',
+  CREATE_AT = 'createdAt',
+}
 export class QuerySystemfeeDto extends QueryDate {
   @IsOptional()
   @ApiPropertyOptional({ enum: TypeSystemFeeEnum })
@@ -22,8 +25,27 @@ export class QuerySystemfeeDto extends QueryDate {
 
   @IsOptional()
   @ApiPropertyOptional()
-  @Transform((data) => stringToBoolean(data.value))
+  @Type(() => Boolean)
   apply: boolean;
+
+  @IsOptional()
+  @ApiPropertyOptional({ enum: QuerySystemFeeEnum })
+  @IsEnum(QuerySystemFeeEnum)
+  sortBy: QuerySystemFeeEnum;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Type(() => Number)
+  @Min(0)
+  @Max(100)
+  min: number;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Type(() => Number)
+  @Min(0)
+  @Max(100)
+  max: number;
 }
 
 export class SystemFeeInforDto {
@@ -41,6 +63,8 @@ export class SystemFeeInforDto {
 
   updatedAt: Date;
 
+  revenue: string;
+
   constructor(entity: SystemFeeEntity) {
     this.id = entity.id;
 
@@ -55,6 +79,8 @@ export class SystemFeeInforDto {
     this.createdAt = entity.createdAt;
 
     this.updatedAt = entity.updatedAt;
+
+    this.revenue = String(entity['revenue']);
   }
 }
 

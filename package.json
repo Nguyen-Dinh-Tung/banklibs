@@ -34,6 +34,7 @@
     "class-validator": "^0.14.0",
     "country-state-city": "^3.1.4",
     "date-fns": "^2.30.0",
+    "env-cross": "^0.0.1-security",
     "helmet": "^7.0.0",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
