@@ -6,7 +6,7 @@ import { UserAdminEntity } from './user-admins.entity';
 @Entity('own_fee')
 export class OwnFeeEntity extends IdDateEntity {
   @OneToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @NotNullColum({})
@@ -22,6 +22,6 @@ export class OwnFeeEntity extends IdDateEntity {
   startDate: Date;
 
   @OneToOne(() => UserAdminEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'creator_id' })
   creator: UserAdminEntity;
 }

@@ -6,13 +6,13 @@ import { SystemFeeEntity } from './system-fee.entity';
 @Entity('system_fee_apply_user')
 export class SystemFeeApplyUserEntity extends IdDateDeleteEntity {
   @ManyToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @IsActiveFalseColumn()
   isActive: boolean;
 
   @ManyToOne(() => SystemFeeEntity, (systemFee) => systemFee.id)
-  @JoinColumn({ name: 'system_fee' })
+  @JoinColumn({ name: 'system_fee_id' })
   systemFee: SystemFeeEntity;
 }

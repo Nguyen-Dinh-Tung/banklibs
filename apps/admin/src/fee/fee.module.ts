@@ -7,6 +7,7 @@ import {
   HistoryOwnFeeSettingEntity,
   HistorySystemFeeSettingEntity,
 } from '@app/common';
+import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     AdminLogModule,
@@ -14,6 +15,7 @@ import {
       HistoryOwnFeeSettingEntity,
       HistorySystemFeeSettingEntity,
     ]),
+    UserModule,
   ],
   controllers: [FeeController],
   providers: [FeeService],

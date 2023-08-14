@@ -60,10 +60,13 @@ export class TransactionEntity extends IdDateEntity {
   @ManyToOne(() => SystemFeeEntity, (systemFee) => systemFee.id, {
     nullable: true,
   })
-  @JoinColumn({ name: 'system_fee' })
+  @JoinColumn({ name: 'system_fee_id' })
   systemFee: SystemFeeEntity;
 
   @OneToOne(() => OwnFeeEntity, (ownFee) => ownFee.id)
-  @JoinColumn({ name: 'own_fee' })
+  @JoinColumn({ name: 'own_fee_id' })
   ownFee: OwnFeeEntity;
+
+  @NotNullColum({})
+  content: string;
 }

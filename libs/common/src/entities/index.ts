@@ -16,3 +16,5 @@ export * from './user-balance.entity';
 export * from './system-fee-apply-user.entity';
 export * from './history-own-fee-setting.entity';
 export * from './history-system-fee-setting.entityt';
+export * from './daimonth-transaction.entity';
+export * from './history-daimonth-transaction.entity';

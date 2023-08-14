@@ -3,13 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseOptions } from './database';
 import {
   HistoryBalanceEntity,
+  HistoryDaimonthTransaction,
   JobEntity,
   NotificationEntity,
   OwnFeeEntity,
-  RoleEntity,
   SystemFeeEntity,
   TransactionEntity,
-  UserAdminEntity,
   UserBalanceEntity,
   UserEntity,
   UserVerificationEntity,
@@ -18,6 +17,9 @@ import { ConfigModule } from '@nestjs/config';
 import { RefundEntity } from './entities/refund.entity';
 import { SystemFeeApplyUserEntity } from './entities/system-fee-apply-user.entity';
 import { NotificationUserEntity } from './entities/notification-user.entity';
+import { DaimonthTransactionEntity } from './entities/daimonth-transaction.entity';
+import { UserFamilyEntity } from './entities/user-family.entity';
+import { EventEntity } from './entities/event.entity';
 @Module({})
 @Global()
 export class CoreModule {
@@ -47,6 +49,10 @@ export class CoreModule {
           NotificationEntity,
           NotificationUserEntity,
           OwnFeeEntity,
+          DaimonthTransactionEntity,
+          HistoryDaimonthTransaction,
+          UserFamilyEntity,
+          EventEntity,
         ]),
       ],
       exports: [TypeOrmModule],

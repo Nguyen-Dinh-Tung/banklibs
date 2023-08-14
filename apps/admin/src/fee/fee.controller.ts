@@ -6,6 +6,9 @@ import { QuerySystemfeeDto } from './dto/query-fee.dto';
 import { SystemFeeApplyDto } from './dto/system-fee-apply.dto';
 import { SystemFeeSettingDto } from './dto/system-fee-setting.dto';
 import { CreateFeeOwnDto } from './dto/create-fee-own.dto';
+import { QueryFeeUserDetailDto } from './dto/query-fee-user-detail.dto';
+import { QueryOwnFeeDto } from './dto/query-system-fee-user.dto';
+import { ApplyFeeOwnDto } from './dto/apply-fee-own.dto';
 
 @Controller('fee')
 export class FeeController {
@@ -46,5 +49,23 @@ export class FeeController {
     @Body() data: CreateFeeOwnDto,
   ) {
     return await this.feeService.createFeeOwn(user, data);
+  }
+
+  @Patch('own-apply')
+  async settingFeeOwn(
+    @Body() data: ApplyFeeOwnDto,
+    @User() user: UserAdminEntity,
+  ) {
+    return await this.feeService.settingFeeOwn(data, user);
+  }
+
+  @Get('user-detail')
+  async getFeeUserDetail(@Query() query: QueryFeeUserDetailDto) {
+    return await this.feeService.getFeeUserDetail(query);
+  }
+
+  @Get('own')
+  async getFeeUser(@Query() query: QueryOwnFeeDto) {
+    return await this.feeService.getFeeUser(query);
   }
 }

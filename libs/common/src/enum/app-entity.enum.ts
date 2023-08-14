@@ -4,4 +4,5 @@ export enum AppEntityEnum {
   JOB = 'job',
   SYSTEM_FEE = 'system_fee',
   SYSTEM_FEE_USER_APPLY = 'SYSTEM_FEE_USER_APPLY',
+  FEE_OWN = 'FEE_OWN',
 }
