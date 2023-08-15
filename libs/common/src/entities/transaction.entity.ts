@@ -31,8 +31,8 @@ export class TransactionEntity extends IdDateEntity {
   @NotNullColum({ type: 'bigint', name: 'amount_pay' })
   amountPay: bigint;
 
-  @NotNullColum({ type: 'bigint', name: 'percent_fee' })
-  percentFee: bigint;
+  @NotNullColum({ name: 'percent_fee' })
+  percentFee: number;
 
   @NotNullColum({ name: 'amount_system_fee', type: 'bigint' })
   amountSystemFee: bigint;
@@ -43,10 +43,6 @@ export class TransactionEntity extends IdDateEntity {
   @NotNullColum({})
   code: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, { nullable: true })
-  @JoinColumn({ name: 'creator_id' })
-  creator: UserEntity;
-
   @DateColumn({ nullable: true, name: 'end_time' })
   endTime: Date;
 
@@ -55,6 +51,10 @@ export class TransactionEntity extends IdDateEntity {
 
   @NotNullColum({ name: 'number_bank' })
   bankNumber: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.id, { nullable: true })
+  @JoinColumn({ name: 'creator_id' })
+  creator: UserEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'receiver_id' })
@@ -66,7 +66,7 @@ export class TransactionEntity extends IdDateEntity {
   @JoinColumn({ name: 'system_fee_id' })
   systemFee: SystemFeeEntity;
 
-  @OneToOne(() => OwnFeeEntity, (ownFee) => ownFee.id)
+  @ManyToOne(() => OwnFeeEntity, (ownFee) => ownFee.id)
   @JoinColumn({ name: 'own_fee_id' })
   ownFee: OwnFeeEntity;
 

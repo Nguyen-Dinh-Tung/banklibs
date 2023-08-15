@@ -52,6 +52,8 @@ export class FeeService {
     return {
       amountOwnFee: amountOwnFee,
       amountSystemFee: amountSystemFee,
+      ownFee: checkOwnFee,
+      systemFee: checkSystemFee,
     };
   }
 }

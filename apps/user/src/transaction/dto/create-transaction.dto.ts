@@ -1,7 +1,7 @@
 import { TypeTransactionEnum } from '@app/common';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateTransactionDto {
   @IsNotEmpty()
@@ -11,9 +11,15 @@ export class CreateTransactionDto {
   @IsNotEmpty()
   @ApiProperty()
   @Transform((data) => BigInt(data.value))
-  amountPay: bigint;
+  payAmount: bigint;
 
   @IsNotEmpty()
   @ApiProperty()
   bankNumber: string;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  @IsString()
+  @Length(0, 40)
+  content: string;
 }
