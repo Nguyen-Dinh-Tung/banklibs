@@ -92,8 +92,6 @@ export class TransactionService {
           .where('id = :idReceiver ', { idReceiver: checkReceiver.id })
           .execute();
 
-        console.log(addSurplus, 'addSurplus');
-
         const newTransaction = await manager.save(TransactionEntity, {
           amountOwnFee: allFee.amountOwnFee,
           amountSystemFee: allFee.amountSystemFee,
