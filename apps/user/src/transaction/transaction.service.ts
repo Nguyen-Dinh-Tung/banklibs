@@ -18,7 +18,7 @@ import {
 } from './dto/before-create-transaction.dto';
 import { UserBalanceService } from '../user-balance/user-balance.service';
 import { FeeService } from '../fee/fee.service';
-import { AppHttpBadRequest } from '@app/exceptions';
+import { AppHttpBadRequestExceptionException } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { genCodeTransaction } from '@app/common/utils';
 
@@ -53,7 +53,7 @@ export class TransactionService {
           .getOne();
 
         if (!checkReceiver) {
-          throw new AppHttpBadRequest(
+          throw new AppHttpBadRequestExceptionException(
             UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
           );
         }
@@ -71,7 +71,7 @@ export class TransactionService {
           allFee.amountOwnFee + allFee.amountSystemFee + data.payAmount;
 
         if (userBalanceTransfer.surplus < payAmountReal) {
-          throw new AppHttpBadRequest(
+          throw new AppHttpBadRequestExceptionException(
             UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE,
           );
         }
@@ -138,7 +138,7 @@ export class TransactionService {
       return { success: true };
     } catch (e) {
       if (e) {
-        throw new AppHttpBadRequest(e.message);
+        throw new AppHttpBadRequestExceptionException(e.message);
       }
     }
   }

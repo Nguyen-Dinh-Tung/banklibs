@@ -1,5 +1,8 @@
 import { UniqueFieldUserInterface, UserAdminEntity } from '@app/common';
-import { AppHttpBadRequest, UserError } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  UserError,
+} from '@app/exceptions';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,7 +22,9 @@ export class UserAdminService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_USER_NOT_EXISTTING,
+      );
     }
 
     return checkUser;

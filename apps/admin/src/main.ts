@@ -1,12 +1,13 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { AllFillterException } from '@app/exceptions';
 import * as morgan from 'morgan';
 import helmet from 'helmet';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AdminModule } from './admin.module';
+import { AllFillterException } from '@app/exceptions';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AdminModule);
 
@@ -62,6 +63,7 @@ async function bootstrap() {
   }
 
   app.useGlobalFilters(new AllFillterException(httpAdapter));
+
   await app.listen(configService.get<number>('ADMIN_PORT'));
 
   Logger.log(`SERVER RUNING PORT : ${configService.get<number>('ADMIN_PORT')}`);

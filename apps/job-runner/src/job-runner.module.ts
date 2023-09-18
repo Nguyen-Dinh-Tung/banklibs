@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { JobRunnerController } from './job-runner.controller';
+import { JobRunnerHandle } from './job-runner.controller';
 import { JobRunnerService } from './job-runner.service';
-
+import { ScheduleDynamicModule } from './schedule/schedule.module';
+import { CoreModule } from '@app/common';
+import { AccountConsumer } from './account/account.consumer';
 @Module({
-  imports: [],
-  controllers: [JobRunnerController],
-  providers: [JobRunnerService],
+  imports: [ScheduleDynamicModule, CoreModule],
+  controllers: [JobRunnerHandle],
+  providers: [JobRunnerService, AccountConsumer],
 })
 export class JobRunnerModule {}

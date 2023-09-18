@@ -63,6 +63,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/job-runner/tsconfig.app.json"
       }
+    },
+    "queue-first": {
+      "type": "application",
+      "root": "apps/queue-first",
+      "entryFile": "main",
+      "sourceRoot": "apps/queue-first/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/queue-first/tsconfig.app.json"
+      }
+    },
+    "queue-second": {
+      "type": "application",
+      "root": "apps/queue-second",
+      "entryFile": "main",
+      "sourceRoot": "apps/queue-second/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/queue-second/tsconfig.app.json"
+      }
     }
   }
 }

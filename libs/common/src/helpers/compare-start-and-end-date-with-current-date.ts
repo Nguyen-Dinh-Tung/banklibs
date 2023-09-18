@@ -4,7 +4,7 @@ export function compareStartAndEndDateWithCurrentDate(
   startTime: Date,
   endTime: Date,
 ) {
-  if (isBefore(startTime, new Date())) {
+  if (isBefore(new Date(), startTime)) {
     throw new BadRequestException('ERROR_STARTDATE_CAN_NOT_BEFORE_CURRENTTIME');
   }
 

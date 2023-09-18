@@ -1,4 +1,7 @@
-import { AppHttpBadRequest, UploaderErrors } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  UploaderErrors,
+} from '@app/exceptions';
 import { Injectable } from '@nestjs/common';
 import { RegisterUserInterface } from './interface/register-user.interface';
 import { saveImage } from '@app/common';
@@ -8,7 +11,9 @@ import { UpdateUserInterface } from './interface/update-user.interface';
 export class UploaderService {
   registerUser(files: Array<Express.Multer.File>) {
     if (Object.keys(files).length != 3) {
-      throw new AppHttpBadRequest(UploaderErrors.ERROR_MISSING_FILES);
+      throw new AppHttpBadRequestExceptionException(
+        UploaderErrors.ERROR_MISSING_FILES,
+      );
     }
 
     const data: RegisterUserInterface = {
@@ -28,7 +33,9 @@ export class UploaderService {
 
   async updateUser(file: Express.Multer.File) {
     if (!file) {
-      throw new AppHttpBadRequest(UploaderErrors.ERROR_MISSING_FILES);
+      throw new AppHttpBadRequestExceptionException(
+        UploaderErrors.ERROR_MISSING_FILES,
+      );
     }
 
     const data: UpdateUserInterface = {};

@@ -10,7 +10,10 @@ import {
   TypeOtpEmailEnum,
   TypeVerificationEnum,
 } from '@app/common';
-import { AppHttpBadRequest, VerificationError } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  VerificationError,
+} from '@app/exceptions';
 
 @Injectable()
 export class UserService {
@@ -91,7 +94,7 @@ export class UserService {
     });
 
     if (checkVerifyEmail) {
-      throw new AppHttpBadRequest(
+      throw new AppHttpBadRequestExceptionException(
         VerificationError.ERORR_USER_WAS_VERIFY_EMAIL,
       );
     }
