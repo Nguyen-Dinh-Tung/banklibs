@@ -1,11 +1,14 @@
 import { logger } from '@app/common';
+import { Injectable } from '@nestjs/common';
 import { AbstractRabbitMqJobsHandle } from './abstract-rabbit-mq-jobs-handle';
 import amqplibConnectionManager, {
   AmqpConnectionManager,
   ChannelWrapper,
 } from 'amqp-connection-manager';
 import { PausedRabbitMqQueues } from './paused-rabbit-mq-queues';
-import { indexOf, random } from 'lodash';
+import { indexOf, isNull, max, random, toInteger } from 'lodash';
+import { randomUUID } from 'crypto';
+@Injectable()
 export class RabbitMqJobsConsumer {
   private maxConsumerConnectionsCount = 5;
 
@@ -13,7 +16,7 @@ export class RabbitMqJobsConsumer {
 
   private sharedChannels: Map<string, ChannelWrapper> = new Map();
   private queueToChannel: Map<string, ChannelWrapper> = new Map();
-  private channelsToJobs: Map<ChannelWrapper, AbstractRabbitMqJobsHandle> =
+  private channelsToJobs: Map<ChannelWrapper, AbstractRabbitMqJobsHandle[]> =
     new Map();
 
   getQueues(): AbstractRabbitMqJobsHandle[] {
@@ -96,5 +99,72 @@ export class RabbitMqJobsConsumer {
     }
 
     this.queueToChannel.set(job.getQueue(), channel);
+
+    this.channelsToJobs.get(channel)
+      ? this.channelsToJobs.get(channel)?.push(job)
+      : this.channelsToJobs.set(channel, [job]);
+
+    // subcribe to queue
+    await channel.consume(
+      job.getQueue(),
+      async (msg) => {
+        if (!isNull(msg)) {
+          await job.consume(channel, msg);
+        }
+      },
+      {
+        consumerTag: this.getConsumerTag(job.getQueue()),
+        prefetch: job.getConcurrency(),
+        noAck: false,
+      },
+    );
+
+    // subcribe retry queue
+    await channel.consume(
+      job.getRetryQueue(),
+      async (msg) => {
+        if (!isNull) {
+          await job.consume(channel, msg);
+        }
+      },
+      {
+        consumerTag: this.getConsumerTag(job.getRetryQueue()),
+        prefetch: max([toInteger(job.getConcurrency() / 4), 1]) ?? 1,
+        noAck: false,
+      },
+    );
+
+    channel.once('error', async (err) => {
+      if (err.message.includes('timeout')) {
+        const jobs = this.channelsToJobs.get(channel);
+
+        if (jobs) {
+          // resubcribe
+          for (const job of jobs) {
+            try {
+              await this.subscribe(job);
+            } catch (e) {
+              logger.error(
+                `rabbit-channel`,
+                `Consumer channel failed resubcribe to ${job.queueName} ${e}`,
+              );
+            }
+          }
+
+          logger.info(
+            `rabbit-channel`,
+            `Resubcribe to  ${JSON.stringify(
+              jobs.map((job) => job.queueName),
+            )}`,
+          );
+          // clear channel closed
+          this.channelsToJobs.delete(channel);
+        }
+      }
+    });
+  }
+
+  getConsumerTag(queueName: string): string {
+    return `${randomUUID()}-${queueName}`;
   }
 }

@@ -63,6 +63,8 @@ export abstract class AbstractRabbitMqJobsHandle extends (EventEmitter as new ()
 
   protected useSharedChannel = false;
 
+  protected concurrency = 1;
+
   public async consume(
     channel: ChannelWrapper,
     consumeMessage: ConsumeMessage,
@@ -169,5 +171,9 @@ export abstract class AbstractRabbitMqJobsHandle extends (EventEmitter as new ()
 
   public getUseSharedChannel(): boolean {
     return this.useSharedChannel;
+  }
+
+  public getConcurrency(): number {
+    return this.concurrency;
   }
 }
