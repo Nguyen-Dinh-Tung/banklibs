@@ -8,6 +8,8 @@ import amqplibConnectionManager, {
 import { PausedRabbitMqQueues } from './paused-rabbit-mq-queues';
 import { indexOf, isNull, max, random, toInteger } from 'lodash';
 import { randomUUID } from 'crypto';
+import { AccountJob } from '../account/account.job';
+import { TransactionJob } from '../transaction/transaction.job';
 @Injectable()
 export class RabbitMqJobsConsumer {
   private maxConsumerConnectionsCount = 5;
@@ -19,18 +21,29 @@ export class RabbitMqJobsConsumer {
   private channelsToJobs: Map<ChannelWrapper, AbstractRabbitMqJobsHandle[]> =
     new Map();
 
+  private readonly sharedChannelName = 'shared-channel';
+  constructor(
+    private readonly accountJob: AccountJob,
+    private readonly transactionJob: TransactionJob,
+  ) {}
+
   getQueues(): AbstractRabbitMqJobsHandle[] {
-    return [];
+    return [this.accountJob, this.transactionJob];
   }
 
   async startRabbitMqJobsConsumer(): Promise<void> {
     try {
       await this.connect();
-
+      let index = 0;
       for (const queue of this.getQueues()) {
         try {
           if (!queue.isDisableConsuming()) {
+            ++index;
             await this.subscribe(queue);
+            logger.info(
+              `rabbit-mq-queue`,
+              `subscribe ${queue.getQueue()} index : ${index}`,
+            );
           }
         } catch (error) {
           logger.error(
@@ -69,10 +82,12 @@ export class RabbitMqJobsConsumer {
   }
 
   private getSharedChannelName(index: number): string {
-    return `${this.sharedChannels}:${index}`;
+    return `${this.sharedChannelName}:${index}`;
   }
 
   private async subscribe(job: AbstractRabbitMqJobsHandle) {
+    logger.info(`rabbit-subscribe `, `${job.getQueue()} is start`);
+
     const pausedQueues = await PausedRabbitMqQueues.getPausedQueues();
 
     if (indexOf(pausedQueues, job.getQueue()) !== -1) {

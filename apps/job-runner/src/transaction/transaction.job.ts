@@ -4,10 +4,9 @@ import {
   BackOffStrategy,
 } from '../rabbit-mq/abstract-rabbit-mq-jobs-handle';
 import { QueueNameEnum } from '../common/constants/queue-name';
-
 @Injectable()
-export class AccountJob extends AbstractRabbitMqJobsHandle {
-  queueName: string = QueueNameEnum.QUEUE_ACCOUNT;
+export class TransactionJob extends AbstractRabbitMqJobsHandle {
+  queueName: string = QueueNameEnum.QUEUE_TRANSACTION;
 
   maxReties = 5;
 
@@ -18,11 +17,7 @@ export class AccountJob extends AbstractRabbitMqJobsHandle {
     delay: 20000,
   };
 
-  constructor() {
-    super();
-  }
-
   async process(payload: any): Promise<any> {
-    console.log(payload, 'payload');
+    return;
   }
 }

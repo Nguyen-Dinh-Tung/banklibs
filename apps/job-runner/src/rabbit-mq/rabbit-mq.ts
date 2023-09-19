@@ -1,4 +1,4 @@
-import amqplib from 'amqplib';
+import * as amqplib from 'amqplib';
 import amqplibConnectionManager, {
   AmqpConnectionManager,
   ChannelWrapper,
@@ -82,6 +82,8 @@ export class RabbitMq {
     this.rabbitMqPublisherConnection.once('close', (arg) => {
       logger.warn(`rabbitmq-connection`, `Publisher connection closed ${arg}`);
     });
+
+    logger.info(`rabbitmq-connect`, 'End connect');
   }
 
   public static async assertQueuesAndExchanges(consumer: RabbitMqJobsConsumer) {
@@ -182,14 +184,13 @@ export class RabbitMq {
         },
       });
 
-      await channel.close();
-      await connect.close();
-
       logger.info(
         `rabbit-mq-assert-exchanel-and-queue`,
         'AssertEchangeAndQueue end',
       );
     }
+    await channel.close();
+    await connect.close();
   }
 
   public static async send(
@@ -265,7 +266,7 @@ export class RabbitMq {
   public static async createOrUpdatePolicy(policy: CreatePolicyPayload) {
     policy.vhost = policy.vhost ?? '/';
 
-    const url = `${process.env.AMQP_CLOUND_URL}/api/policies/%2f/${policy.name}`;
+    const url = `${process.env.AMQP_CLOUND_URL_HTTP}/api/policies/%2f/${policy.name}`;
 
     await axios
       .put(url, {
@@ -277,28 +278,31 @@ export class RabbitMq {
         vhost: policy.vhost,
       })
       .then((res) => {
-        logger.info(
-          `rabbit-mq-policy`,
-          `
-          Name : ${policy.name} 
-          apply : ${policy.applyTo}  
-          priority : ${policy.priority} 
-          pattern : ${policy.pattern} 
-          vhost : ${policy.vhost}
-          `,
-        );
+        if (res.status === 201) {
+          logger.info(
+            `rabbit-mq-policy`,
+            `
+            Name : ${policy.name} 
+            apply : ${policy.applyTo}  
+            priority : ${policy.priority} 
+            pattern : ${policy.pattern} 
+            vhost : ${policy.vhost}
+            `,
+          );
+        }
       })
       .catch((e) => {
-        logger.error(
-          'rabbit-mq-policy',
-          `create policy error ${JSON.parse(e)}`,
-        );
+        if (e) {
+          console.log(e);
+
+          logger.error('rabbit-mq-policy', `create policy error`);
+        }
       });
   }
 
   public static async deletePolicy(policy: DeletePolicyPayload) {
     policy.vhost = policy.vhost ?? '/';
-    const url = `${process.env.AMQP_CLOUND_URL}/api/policies/%2F/${policy.name}`;
+    const url = `${process.env.AMQP_CLOUND_URL_HTTP}/api/policies/%2F/${policy.name}`;
 
     await axios.delete(url, {
       data: {
