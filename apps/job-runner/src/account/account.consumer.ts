@@ -3,10 +3,9 @@ import { QueueNameEnum } from '../common/constants/queue-name';
 import { EXPIRES_QUEUE } from '../common/constants/queue-expires';
 import { EXCHANEL_NAME, ROUTER_KEY } from '@app/common';
 import * as amqp from 'amqplib';
-import { ConsumerAbstract } from '../rabbitmq/rabbitmq-consumer.abstract';
 
 @Injectable()
-export class AccountConsumer extends ConsumerAbstract {
+export class AccountConsumer {
   static logger = new Logger();
 
   static queueName: string = QueueNameEnum.QUEUE_ACCOUNT;
@@ -20,7 +19,6 @@ export class AccountConsumer extends ConsumerAbstract {
   static exclusive = true;
 
   constructor() {
-    super();
     this.assetExchangeAndBindingQueue();
   }
 

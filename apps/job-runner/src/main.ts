@@ -1,19 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { JobRunnerModule } from './job-runner.module';
 import { JobRunnerHandle } from './job-runner.controller';
+import { RabbitMq } from './rabbit-mq/rabbit-mq';
 
 async function bootstrap() {
   const app = await NestFactory.create(JobRunnerModule);
 
-  // const jobRunner = await app.get(JobRunnerHandle);
+  await RabbitMq.connect();
 
-  // const listConsumer = jobRunner.connectConsumer();
-
-  // if (listConsumer.length) {
-  //   for (const e of listConsumer) {
-  //     e.assetExchangeAndBindingQueue();
-  //   }
-  // }
   await app.listen(3002);
 }
 bootstrap();
