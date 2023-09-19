@@ -1,4 +1,7 @@
-import { AppHttpBadRequest, UploaderErrors } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  UploaderErrors,
+} from '@app/exceptions';
 import { Injectable, PipeTransform } from '@nestjs/common';
 const mimeType = ['jpg', 'jpeg', 'png'];
 @Injectable()
@@ -11,6 +14,8 @@ export class ValidatorFilePipe implements PipeTransform {
   validator(file?: Express.Multer.File) {
     const fileType = file.mimetype.split('/')[file.mimetype.split.length - 1];
     if (!mimeType.includes(fileType))
-      throw new AppHttpBadRequest(UploaderErrors.ERROR_MIMETYPE_NOT_SUPPORT);
+      throw new AppHttpBadRequestExceptionException(
+        UploaderErrors.ERROR_MIMETYPE_NOT_SUPPORT,
+      );
   }
 }

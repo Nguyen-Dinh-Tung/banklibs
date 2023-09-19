@@ -8,7 +8,10 @@ import {
   titleOtpForgotPassword,
 } from '@app/common';
 import { TypeOtpEmailEnum } from '@app/common';
-import { AppHttpBadRequest, OtpErrors } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  OtpErrors,
+} from '@app/exceptions';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -37,7 +40,9 @@ export class OtpService {
     if (checkExistOtp) {
       if (Number(checkExistOtp.expires) > Number(Date.now())) {
         if (checkExistOtp.times >= +process.env.MAX_GENERATE_OTP_EMAIL) {
-          throw new AppHttpBadRequest(OtpErrors.ERROR_MAX_GENERATE_OTP);
+          throw new AppHttpBadRequestExceptionException(
+            OtpErrors.ERROR_MAX_GENERATE_OTP,
+          );
         }
         await this.newOtpEmail(otp, user, checkExistOtp.times + 1, type);
         await this.otpEmailRepo.softDelete({ id: checkExistOtp.id });
@@ -90,14 +95,20 @@ export class OtpService {
     });
 
     if (!checkOtp) {
-      throw new AppHttpBadRequest(OtpErrors.ERROR_OTP_EMAIL_NOT_FOUND);
+      throw new AppHttpBadRequestExceptionException(
+        OtpErrors.ERROR_OTP_EMAIL_NOT_FOUND,
+      );
     }
 
     if (!bcrypt.compareSync(code, checkOtp.code)) {
-      throw new AppHttpBadRequest(OtpErrors.ERROR_OTP_EMAIL_INVALID);
+      throw new AppHttpBadRequestExceptionException(
+        OtpErrors.ERROR_OTP_EMAIL_INVALID,
+      );
     } else {
       if (Number(checkOtp.expires) > Date.now()) {
-        throw new AppHttpBadRequest(OtpErrors.ERROR_OTP_EMAIL_EXPIRED);
+        throw new AppHttpBadRequestExceptionException(
+          OtpErrors.ERROR_OTP_EMAIL_EXPIRED,
+        );
       }
     }
 

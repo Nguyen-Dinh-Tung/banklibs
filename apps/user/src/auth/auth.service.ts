@@ -8,7 +8,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { AppHttpBadRequest, JobErrors, UserError } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  JobErrors,
+  UserError,
+} from '@app/exceptions';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -51,7 +55,9 @@ export class AuthService {
     });
 
     if (checkUser) {
-      throw new AppHttpBadRequest(UserError.ERROR_EXISTED_USER);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_EXISTED_USER,
+      );
     }
 
     const checkJob = await this.jobRepo.findOne({
@@ -61,7 +67,9 @@ export class AuthService {
     });
 
     if (!checkJob) {
-      throw new AppHttpBadRequest(JobErrors.ERROR_JOB_NOT_FOUND);
+      throw new AppHttpBadRequestExceptionException(
+        JobErrors.ERROR_JOB_NOT_FOUND,
+      );
     }
 
     delete data.idJob;
@@ -118,11 +126,15 @@ export class AuthService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_USER_NOT_EXISTTING,
+      );
     }
 
     if (!bcrypt.compareSync(data.password, checkUser.password)) {
-      throw new AppHttpBadRequest(UserError.ERROR_PASSWORD_FAIL);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_PASSWORD_FAIL,
+      );
     }
 
     return {
@@ -151,7 +163,9 @@ export class AuthService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_USER_NOT_EXISTTING,
+      );
     }
     return await this.otpService.forgotPassword(checkUser);
   }
@@ -164,7 +178,9 @@ export class AuthService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequest(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_USER_NOT_EXISTTING,
+      );
     }
 
     await this.otpService.verifyOtpEmail(
@@ -192,7 +208,9 @@ export class AuthService {
       });
 
       if (!checkJob) {
-        throw new AppHttpBadRequest(JobErrors.ERROR_JOB_NOT_FOUND);
+        throw new AppHttpBadRequestExceptionException(
+          JobErrors.ERROR_JOB_NOT_FOUND,
+        );
       }
       user['job'] = checkJob;
     }

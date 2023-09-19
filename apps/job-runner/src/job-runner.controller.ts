@@ -1,12 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
-import { JobRunnerService } from './job-runner.service';
+import { Controller } from '@nestjs/common';
 
 @Controller()
-export class JobRunnerController {
-  constructor(private readonly jobRunnerService: JobRunnerService) {}
-
-  @Get()
-  getHello(): string {
-    return this.jobRunnerService.getHello();
-  }
+export class JobRunnerHandle {
+  // constructor(private readonly accountConsumer: AccountConsumer) {}
+  // public connectConsumer() {
+  //   return [this.accountConsumer];
+  // }
 }

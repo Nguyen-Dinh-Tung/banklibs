@@ -23,7 +23,11 @@ import {
   SystemFeeInforDto,
 } from './dto/query-fee.dto';
 import { SystemFeeApplyDto } from './dto/system-fee-apply.dto';
-import { AppHttpBadRequest, FeeErrors, UserError } from '@app/exceptions';
+import {
+  AppHttpBadRequestExceptionException,
+  FeeErrors,
+  UserError,
+} from '@app/exceptions';
 import { SystemFeeSettingDto } from './dto/system-fee-setting.dto';
 import { isAfter } from 'date-fns';
 import { CreateFeeOwnDto } from './dto/create-fee-own.dto';
@@ -185,7 +189,9 @@ export class FeeService {
     });
 
     if (!checkSystemFee) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_SYSTEM_FEE_NOT_FOUND);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_SYSTEM_FEE_NOT_FOUND,
+      );
     }
     const checkSystemFeeCurrent = await this.systemFeeRepo.findOne({
       where: {
@@ -195,7 +201,9 @@ export class FeeService {
     });
 
     if (checkSystemFeeCurrent) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_EXISTED_SYSTEM_FEE_CURRENT);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_EXISTED_SYSTEM_FEE_CURRENT,
+      );
     }
 
     await this.systemFeeRepo.update({ id: checkSystemFee.id }, { apply: true });
@@ -224,14 +232,18 @@ export class FeeService {
     });
 
     if (!checkSystemFee) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_SYSTEM_FEE_NOT_FOUND);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_SYSTEM_FEE_NOT_FOUND,
+      );
     }
 
     if (
       isAfter(new Date(), new Date(checkSystemFee.endDate)) ||
       !checkSystemFee.apply
     ) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_SYSTEM_FEE_NOT_WORKING);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_SYSTEM_FEE_NOT_WORKING,
+      );
     }
 
     const checkUsers = await this.userRepo.find({
@@ -241,7 +253,9 @@ export class FeeService {
     });
 
     if (checkUsers.length !== data.ids.length) {
-      throw new AppHttpBadRequest(UserError.ERROR_ONE_OR_MORE_USER_NOT_FOUND);
+      throw new AppHttpBadRequestExceptionException(
+        UserError.ERROR_ONE_OR_MORE_USER_NOT_FOUND,
+      );
     }
 
     const checkExistApply = await this.systemFeeApplyUserRepo.find({
@@ -253,7 +267,9 @@ export class FeeService {
     });
 
     if (checkExistApply.length) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_ONE_OR_MORE_USER_WAS_APPLY);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_ONE_OR_MORE_USER_WAS_APPLY,
+      );
     }
 
     const systemFeeAplly = checkUsers.map((e) => {
@@ -343,7 +359,9 @@ export class FeeService {
     });
 
     if (!checkOwnFee) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_OWN_FEE_NOT_FOUND);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_OWN_FEE_NOT_FOUND,
+      );
     }
 
     const checkCurrentOwnFee = await this.ownFeeRepo.findOne({
@@ -354,7 +372,9 @@ export class FeeService {
     });
 
     if (checkCurrentOwnFee) {
-      throw new AppHttpBadRequest(FeeErrors.ERROR_EXISTED_OWN_FEE_USING);
+      throw new AppHttpBadRequestExceptionException(
+        FeeErrors.ERROR_EXISTED_OWN_FEE_USING,
+      );
     }
 
     compareStartAndEndDateWithCurrentDate(
