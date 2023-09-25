@@ -1,11 +1,4 @@
-import {
-  LENGTH_TRANSACTION_CODE,
-  PREFIX_TRANSACTION_CODE,
-  StatusTransactionEnum,
-  TransactionEntity,
-  UserBalanceEntity,
-  UserEntity,
-} from '@app/common';
+import { TransactionEntity, UserBalanceEntity, UserEntity } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -16,9 +9,6 @@ import {
 } from './dto/before-create-transaction.dto';
 import { UserBalanceService } from '../user-balance/user-balance.service';
 import { FeeService } from '../fee/fee.service';
-import { AppHttpBadRequestExceptionException } from '@app/exceptions';
-import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
-import { genCodeTransaction } from '@app/common/utils';
 
 @Injectable()
 export class TransactionService {

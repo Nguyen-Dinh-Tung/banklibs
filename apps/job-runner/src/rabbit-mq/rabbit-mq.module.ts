@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { RabbitMqJobsConsumer } from './rabbit-mq-jobs-consumer';
 import { AccountJob } from '../account/account.job';
-import { TransactionJob } from '../transaction/transaction.job';
+import { TransactionModule } from '../transaction/transaction.module';
 @Module({
-  providers: [RabbitMqJobsConsumer, AccountJob, TransactionJob],
+  imports: [TransactionModule],
+  providers: [RabbitMqJobsConsumer, AccountJob],
 })
 export class RabbitMqModule {}

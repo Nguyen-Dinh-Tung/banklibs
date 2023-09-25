@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { DateColumn, IdDateEntity, NotNullColum } from '../database';
 import {
   StatusTransactionEnum,

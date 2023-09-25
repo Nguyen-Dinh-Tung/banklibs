@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RabbitMq } from '@app/common';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(UserModule);
 
@@ -15,6 +16,8 @@ async function bootstrap() {
   morgan.token('body', function (req: any) {
     return JSON.stringify(req?.body ?? '{}');
   });
+
+  await RabbitMq.connect();
 
   app.use(
     morgan(

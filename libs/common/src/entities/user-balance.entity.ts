@@ -1,15 +1,16 @@
-import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Check, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { IdDateEntity, NotNullColum } from '../database';
 import { UserEntity } from './user.enitty';
 import { HistoryBalanceEntity } from './history-balance.entity';
 
 @Entity('user_balance')
+@Check(`"surplus" > 0`)
 export class UserBalanceEntity extends IdDateEntity {
   @OneToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @NotNullColum({ default: 0, type: 'bigint' })
+  @NotNullColum({ default: 0, type: 'bigint', unsigned: true })
   surplus: bigint;
 
   @NotNullColum({ default: false })
