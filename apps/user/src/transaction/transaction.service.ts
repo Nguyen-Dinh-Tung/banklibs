@@ -36,75 +36,17 @@ export class TransactionService {
   ) {}
 
   async createTransaction(user: UserEntity, data: CreateTransactionDto) {
-    const res = await RabbitMq.send({
-      ...data,
-      payAmount: String(data.payAmount),
-      exchannelName: 'transacion-exchannel',
-      queueName: 'transacion-queue',
-      retryCounts: 0,
-    } as unknown as MessageRabbitMq);
-
-    return {
-      success: res,
-    };
-    // await this.dataSource.transaction(async (manager) => {
-    //   const start = new Date().toISOString();
-    //   const allFee = await this.feeService.getAllFee(user.id, data.payAmount);
-    //   const checkReceiver = await manager
-    //     .getRepository(UserBalanceEntity)
-    //     .createQueryBuilder('balance')
-    //     .leftJoinAndSelect('balance.user', 'user')
-    //     .where('balance.bankNumber = :bankNumber', {
-    //       bankNumber: data.bankNumber,
-    //     })
-    //     .getOne();
-    //   if (!checkReceiver) {
-    //     throw new AppHttpBadRequestExceptionException(
-    //       UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
-    //     );
-    //   }
-    //   const userBalanceTransfer = await manager
-    //     .getRepository(UserBalanceEntity)
-    //     .createQueryBuilder('balance')
-    //     .leftJoin('balance.user', 'user')
-    //     .setLock('pessimistic_write')
-    //     .where('user.id = :idUserTransfer', { idUserTransfer: user.id })
-    //     .getOne();
-    //   const payAmountReal =
-    //     allFee.amountOwnFee + allFee.amountSystemFee + data.payAmount;
-    //   if (userBalanceTransfer.surplus < payAmountReal) {
-    //     throw new AppHttpBadRequestExceptionException(
-    //       UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE,
-    //     );
-    //   }
-    //   const ownerFee = allFee?.ownFee?.percent ?? 0;
-    //   const systemFee = allFee?.systemFee?.percent ?? 0;
-    //   await manager.save(TransactionEntity, {
-    //     amountOwnFee: allFee.amountOwnFee,
-    //     amountSystemFee: allFee.amountSystemFee,
-    //     amountPay: data.payAmount,
-    //     amountReal: payAmountReal,
-    //     bankNumber: data.bankNumber,
-    //     code: await genCodeTransaction(
-    //       PREFIX_TRANSACTION_CODE,
-    //       LENGTH_TRANSACTION_CODE,
-    //       manager.getRepository(TransactionEntity),
-    //     ),
-    //     content: data.content ? data.content : 'Transfer',
-    //     createdAt: start,
-    //     creator: user,
-    //     ownFee: allFee.ownFee,
-    //     systemFee: allFee.systemFee,
-    //     status: StatusTransactionEnum.PEDING,
-    //     receiver: checkReceiver.user,
-    //     typeTransaction: data.typeTransaction,
-    //     percentFee: ownerFee + systemFee,
-    //     systemHandle: false,
-    //   });
-    // });
-    // return { success: true };
-    const check = 0;
-    this.userBalanceRepo.createQueryBuilder();
+    // const res = await RabbitMq.send({
+    //   ...data,
+    //   payAmount: String(data.payAmount),
+    //   exchannelName: 'transacion-exchannel',
+    //   queueName: 'transacion-queue',
+    //   retryCounts: 0,
+    //   senderId: user.id,
+    // } as unknown as MessageRabbitMq);
+    // return {
+    //   success: res,
+    // };
   }
 
   async beforeCreate(data: BeforeCreateTransactionDto, user: UserEntity) {

@@ -92,6 +92,7 @@ async function bootstrap() {
   await transactionConsumer.startRabbitMqTransactionConsumer(
     transactionJobHandle,
   );
+
   await app.listen(configService.get<number>('USER_PORT'));
 
   Logger.log(`SERVER RUNING PORT : ${configService.get<number>('USER_PORT')}`);

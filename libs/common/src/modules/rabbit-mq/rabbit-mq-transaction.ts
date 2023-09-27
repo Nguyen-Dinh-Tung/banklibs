@@ -12,6 +12,7 @@ export type MessageRabbitMq = {
   routerKey: string;
   queueName: string;
   retryCounts: number;
+  senderId?: string;
 };
 
 export class RabbitMq {
@@ -24,53 +25,28 @@ export class RabbitMq {
   private static rabbitMqPublisherChannel: amqp.Channel;
 
   public static async connect() {
-    // logger.info(`rabbit-mq-transaction-connect`, 'start connect');
-    // const connect = await amqplibConnectionManager.connect(
-    //   process.env.AMQP_CLOUND_URL,
-    // );
-    // RabbitMq.rabbitMqPublisherConnect = connect;
-    // const channel = connect.createChannel();
-    // RabbitMq.rabbitMqPublisherChannel = channel;
-    // channel.once('error', (error) => {
-    //   logger.error(
-    //     `rabbit-mq-transaction`,
-    //     `channel error connect : channel:` + error,
-    //     error.stack,
-    //   );
-    // });
-    // channel.once('close', () => {
-    //   logger.warn(`rabbit-mq-transaction`, `channel close connect : channel: `);
-    // });
-    // connect.once('error', (error) => {
-    //   logger.error(
-    //     `rabbit-mq-transaction`,
-    //     `connect error  ` + error,
-    //     error.stack,
-    //   );
-    // });
-    // connect.once('close', (arg) => {
-    //   logger.error(`rabbit-mq-transaction`, `connect close  ` + arg);
-    // });
+    logger.info('rabbit-mq-transaction', 'assert queue and assert exchange');
+    const connect = await amqp.connect(process.env.AMQP_CLOUND_URL);
+    const channel = await connect.createChannel();
+    this.rabbitMqPublisherChannel = channel;
   }
 
   public static async assertQueuesAndExchannel(
     job: RabbitMqTransactionJobHandle,
   ) {
-    logger.info('rabbit-mq-transaction', 'assert queue and assert exchange');
-    const connect = await amqp.connect(process.env.AMQP_CLOUND_URL);
-    const channel = await connect.createChannel();
+    await this.rabbitMqPublisherChannel.assertExchange(
+      job.exchannelName,
+      'direct',
+      {
+        durable: true,
+      },
+    );
 
-    this.rabbitMqPublisherChannel = channel;
-
-    await channel.assertExchange(job.exchannelName, 'direct', {
-      durable: true,
-    });
-
-    await channel.once('close', () => {
+    await this.rabbitMqPublisherChannel.once('close', () => {
       logger.info(`rabbit-mq-transaction`, 'disconnect');
     });
 
-    await channel.once('error', () => {
+    await this.rabbitMqPublisherChannel.once('error', () => {
       logger.error(`rabbit-mq-transaction`, 'rabbit mq error ');
     });
   }
