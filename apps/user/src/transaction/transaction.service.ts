@@ -1,7 +1,6 @@
 import {
-  LENGTH_TRANSACTION_CODE,
-  PREFIX_TRANSACTION_CODE,
-  StatusTransactionEnum,
+  MessageRabbitMq,
+  RabbitMq,
   TransactionEntity,
   UserBalanceEntity,
   UserEntity,
@@ -16,9 +15,6 @@ import {
 } from './dto/before-create-transaction.dto';
 import { UserBalanceService } from '../user-balance/user-balance.service';
 import { FeeService } from '../fee/fee.service';
-import { AppHttpBadRequestExceptionException } from '@app/exceptions';
-import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
-import { genCodeTransaction } from '@app/common/utils';
 
 @Injectable()
 export class TransactionService {
@@ -40,6 +36,17 @@ export class TransactionService {
   ) {}
 
   async createTransaction(user: UserEntity, data: CreateTransactionDto) {
+    const res = await RabbitMq.send({
+      ...data,
+      payAmount: String(data.payAmount),
+      exchannelName: 'transacion-exchannel',
+      queueName: 'transacion-queue',
+      retryCounts: 0,
+    } as unknown as MessageRabbitMq);
+
+    return {
+      success: res,
+    };
     // await this.dataSource.transaction(async (manager) => {
     //   const start = new Date().toISOString();
     //   const allFee = await this.feeService.getAllFee(user.id, data.payAmount);
@@ -97,6 +104,7 @@ export class TransactionService {
     // });
     // return { success: true };
     const check = 0;
+    this.userBalanceRepo.createQueryBuilder();
   }
 
   async beforeCreate(data: BeforeCreateTransactionDto, user: UserEntity) {
