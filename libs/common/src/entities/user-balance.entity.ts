@@ -9,7 +9,7 @@ export class UserBalanceEntity extends IdDateEntity {
   @OneToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
-
+  
   @NotNullColum({ default: 0, type: 'bigint', unsigned: true })
   surplus: bigint;
 

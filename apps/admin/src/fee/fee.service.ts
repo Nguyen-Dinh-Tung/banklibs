@@ -24,7 +24,7 @@ import {
 } from './dto/query-fee.dto';
 import { SystemFeeApplyDto } from './dto/system-fee-apply.dto';
 import {
-  AppHttpBadRequestExceptionException,
+  AppHttpBadRequestException,
   FeeErrors,
   UserError,
 } from '@app/exceptions';
@@ -189,7 +189,7 @@ export class FeeService {
     });
 
     if (!checkSystemFee) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         FeeErrors.ERROR_SYSTEM_FEE_NOT_FOUND,
       );
     }
@@ -201,7 +201,7 @@ export class FeeService {
     });
 
     if (checkSystemFeeCurrent) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         FeeErrors.ERROR_EXISTED_SYSTEM_FEE_CURRENT,
       );
     }
@@ -232,7 +232,7 @@ export class FeeService {
     });
 
     if (!checkSystemFee) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         FeeErrors.ERROR_SYSTEM_FEE_NOT_FOUND,
       );
     }
@@ -241,7 +241,7 @@ export class FeeService {
       isAfter(new Date(), new Date(checkSystemFee.endDate)) ||
       !checkSystemFee.apply
     ) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         FeeErrors.ERROR_SYSTEM_FEE_NOT_WORKING,
       );
     }
@@ -253,7 +253,7 @@ export class FeeService {
     });
 
     if (checkUsers.length !== data.ids.length) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         UserError.ERROR_ONE_OR_MORE_USER_NOT_FOUND,
       );
     }
@@ -267,7 +267,7 @@ export class FeeService {
     });
 
     if (checkExistApply.length) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         FeeErrors.ERROR_ONE_OR_MORE_USER_WAS_APPLY,
       );
     }
@@ -359,9 +359,7 @@ export class FeeService {
     });
 
     if (!checkOwnFee) {
-      throw new AppHttpBadRequestExceptionException(
-        FeeErrors.ERROR_OWN_FEE_NOT_FOUND,
-      );
+      throw new AppHttpBadRequestException(FeeErrors.ERROR_OWN_FEE_NOT_FOUND);
     }
 
     const checkCurrentOwnFee = await this.ownFeeRepo.findOne({
@@ -372,7 +370,7 @@ export class FeeService {
     });
 
     if (checkCurrentOwnFee) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         FeeErrors.ERROR_EXISTED_OWN_FEE_USING,
       );
     }

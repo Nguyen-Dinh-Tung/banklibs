@@ -1,4 +1,10 @@
-import { DataSource, MoreThan, Repository, UpdateResult } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  MoreThan,
+  Repository,
+  UpdateResult,
+} from 'typeorm';
 import { logger } from '../logger';
 import { MessageRabbitMq, RabbitMq } from './rabbit-mq-transaction';
 import * as amqplib from 'amqplib';
@@ -16,10 +22,11 @@ import {
   LENGTH_TRANSACTION_CODE,
   PREFIX_TRANSACTION_CODE,
 } from '@app/common/constants';
-import { AppHttpBadRequestExceptionException } from '@app/exceptions';
+import { AppHttpBadRequestException } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { getAllFee } from '@app/common/interfaces/get-all-fee.interface';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateTransacionInterface } from '@app/common/interfaces';
 export class RabbitMqTransactionJobHandle {
   durable = true;
 
@@ -45,8 +52,6 @@ export class RabbitMqTransactionJobHandle {
 
   async process(payload: MessageRabbitMq): Promise<boolean> {
     await this.dataSource.transaction(async (manager) => {
-      const start = new Date().toISOString();
-
       const allFee = await this.getAllFee(
         payload.senderId,
         BigInt(payload.payAmount),
@@ -62,7 +67,7 @@ export class RabbitMqTransactionJobHandle {
         .getOne();
 
       if (!checkReceiver) {
-        throw new AppHttpBadRequestExceptionException(
+        throw new AppHttpBadRequestException(
           UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
         );
       }
@@ -108,8 +113,8 @@ export class RabbitMqTransactionJobHandle {
               LENGTH_TRANSACTION_CODE,
               manager.getRepository(TransactionEntity),
             ),
-            content: payload.content ? payload.content : 'Transfer',
-            createdAt: start,
+            content: 'ERROR_INSUFFICIENT_BALANCE',
+            createdAt: payload.start,
             creator: senderBalance.user,
             ownFee: allFee.ownFee,
             systemFee: allFee.systemFee,
@@ -143,7 +148,7 @@ export class RabbitMqTransactionJobHandle {
               manager.getRepository(TransactionEntity),
             ),
             content: payload.content ? payload.content : 'Transfer',
-            createdAt: start,
+            createdAt: payload.start,
             creator: senderBalance.user,
             ownFee: allFee.ownFee,
             systemFee: allFee.systemFee,
@@ -228,14 +233,12 @@ export class RabbitMqTransactionJobHandle {
   }
 
   getDeadletter(): string {
-    return `dead-letter-${this.queueName}`;
+    return `${this.queueName}-dead-letter`;
   }
 
   getRetryQueue(): string {
-    return `retry-${this.queueName}`;
+    return `${this.queueName}-retry`;
   }
-
-  async send() {}
 
   async getAllFee(idUser: string, payAmount: bigint): Promise<getAllFee> {
     const checkOwnFee = await this.ownFeeRepo.findOne({
@@ -275,4 +278,9 @@ export class RabbitMqTransactionJobHandle {
       systemFee: checkSystemFee,
     };
   }
+
+  async createTransacion(
+    payload: CreateTransacionInterface,
+    manager: EntityManager,
+  ) {}
 }

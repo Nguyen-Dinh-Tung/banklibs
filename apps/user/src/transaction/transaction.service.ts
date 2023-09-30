@@ -36,17 +36,19 @@ export class TransactionService {
   ) {}
 
   async createTransaction(user: UserEntity, data: CreateTransactionDto) {
-    // const res = await RabbitMq.send({
-    //   ...data,
-    //   payAmount: String(data.payAmount),
-    //   exchannelName: 'transacion-exchannel',
-    //   queueName: 'transacion-queue',
-    //   retryCounts: 0,
-    //   senderId: user.id,
-    // } as unknown as MessageRabbitMq);
-    // return {
-    //   success: res,
-    // };
+    const res = await RabbitMq.send({
+      ...data,
+      payAmount: String(data.payAmount),
+      exchannelName: 'transacion-exchannel',
+      queueName: 'transacion-queue',
+      retryCounts: 0,
+      senderId: user.id,
+      start: new Date().toISOString(),
+    } as unknown as MessageRabbitMq);
+
+    return {
+      success: res,
+    };
   }
 
   async beforeCreate(data: BeforeCreateTransactionDto, user: UserEntity) {

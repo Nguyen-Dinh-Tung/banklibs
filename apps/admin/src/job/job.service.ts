@@ -3,10 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateJobDto } from './dto/create-job.dto';
-import {
-  AppHttpBadRequestExceptionException,
-  JobErrors,
-} from '@app/exceptions';
+import { AppHttpBadRequestException, JobErrors } from '@app/exceptions';
 import { AdminLogService } from '../admin-log/admin-log.service';
 import { AppEntityEnum, PageMeta } from '@app/common';
 import { AppTypeLogEnum } from '@app/common/enum/app-type-log.enum';
@@ -30,9 +27,7 @@ export class JobService {
     });
 
     if (checkJob) {
-      throw new AppHttpBadRequestExceptionException(
-        JobErrors.ERROR_EXISTED_JOB,
-      );
+      throw new AppHttpBadRequestException(JobErrors.ERROR_EXISTED_JOB);
     }
     const newJob = this.jobRepo.create({
       createdAt: new Date().toISOString(),
@@ -81,9 +76,7 @@ export class JobService {
     });
 
     if (!checkJob) {
-      throw new AppHttpBadRequestExceptionException(
-        JobErrors.ERROR_JOB_NOT_FOUND,
-      );
+      throw new AppHttpBadRequestException(JobErrors.ERROR_JOB_NOT_FOUND);
     }
 
     return {
@@ -99,9 +92,7 @@ export class JobService {
     });
 
     if (!checkJob) {
-      throw new AppHttpBadRequestExceptionException(
-        JobErrors.ERROR_JOB_NOT_FOUND,
-      );
+      throw new AppHttpBadRequestException(JobErrors.ERROR_JOB_NOT_FOUND);
     }
 
     if (data.name && data.name !== checkJob.name) {
@@ -112,9 +103,7 @@ export class JobService {
       });
 
       if (checkNewName) {
-        throw new AppHttpBadRequestExceptionException(
-          JobErrors.ERROR_EXISTED_JOB,
-        );
+        throw new AppHttpBadRequestException(JobErrors.ERROR_EXISTED_JOB);
       }
     }
 

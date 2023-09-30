@@ -4,10 +4,7 @@ import { LoginUserAdminDto } from './dto/login-user-admin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtInterface, EnvVariable } from '@app/common';
 import * as bcrypt from 'bcrypt';
-import {
-  AppHttpBadRequestExceptionException,
-  UserAdminError,
-} from '@app/exceptions';
+import { AppHttpBadRequestException, UserAdminError } from '@app/exceptions';
 @Injectable()
 export class AuthService {
   constructor(
@@ -21,9 +18,7 @@ export class AuthService {
     });
 
     if (!bcrypt.compare(data.password, checkUser.password)) {
-      throw new AppHttpBadRequestExceptionException(
-        UserAdminError.ERROR_WRONG_PASSWORD,
-      );
+      throw new AppHttpBadRequestException(UserAdminError.ERROR_WRONG_PASSWORD);
     }
 
     return {

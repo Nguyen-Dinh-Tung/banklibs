@@ -13,6 +13,7 @@ export type MessageRabbitMq = {
   queueName: string;
   retryCounts: number;
   senderId?: string;
+  start: string;
 };
 
 export class RabbitMq {

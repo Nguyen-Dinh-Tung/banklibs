@@ -8,7 +8,7 @@ import {
   logger,
 } from '@app/common';
 import { RefundEntity } from '@app/common/entities/refund.entity';
-import { AppHttpBadRequestExceptionException } from '@app/exceptions';
+import { AppHttpBadRequestException } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -74,7 +74,7 @@ export class TransactionService {
         });
 
       if (userBalanceTransfer.surplus < transacion.amountReal) {
-        throw new AppHttpBadRequestExceptionException(
+        throw new AppHttpBadRequestException(
           UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE,
         );
       }

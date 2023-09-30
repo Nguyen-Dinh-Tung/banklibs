@@ -16,7 +16,7 @@ export class AppHttpException extends HttpException {
   }
 }
 
-export class AppHttpBadRequestExceptionException extends AppHttpException {
+export class AppHttpBadRequestException extends AppHttpException {
   constructor(public code: string, message?: string) {
     super(code, message, HttpStatus.BAD_REQUEST);
   }

@@ -1,8 +1,5 @@
 import { UniqueFieldUserInterface, UserBalanceEntity } from '@app/common';
-import {
-  AppHttpBadRequestExceptionException,
-  ServerErrors,
-} from '@app/exceptions';
+import { AppHttpBadRequestException, ServerErrors } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,13 +22,11 @@ export class UserBalanceService {
     });
 
     if (!checkSurplus) {
-      throw new AppHttpBadRequestExceptionException(
-        ServerErrors.ERROR_SERVER_INTERVAL,
-      );
+      throw new AppHttpBadRequestException(ServerErrors.ERROR_SERVER_INTERVAL);
     }
 
     if (checkSurplus.surplus < payAmountReal) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE,
       );
     }
@@ -50,7 +45,7 @@ export class UserBalanceService {
     });
 
     if (!checkReceiver) {
-      throw new AppHttpBadRequestExceptionException(
+      throw new AppHttpBadRequestException(
         UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
       );
     }
