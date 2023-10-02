@@ -1,9 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Query } from '@nestjs/common';
 import { User, UserEntity } from '@app/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { BeforeCreateTransactionDto } from './dto/before-create-transaction.dto';
 import { TransactionService } from './transaction.service';
 import { FindBankNumberDto } from './dto/find-bank-number.dto';
+import { QueryTransacionDto } from './dto/query-transaction.dto';
 
 @Controller('transaction')
 export class TransactionController {
@@ -31,5 +32,10 @@ export class TransactionController {
     data: FindBankNumberDto,
   ) {
     return await this.transactionService.banknumberCheck(data);
+  }
+
+  @Get()
+  async findAll(@Query() query: QueryTransacionDto, @User() user: UserEntity) {
+    return await this.transactionService.findAll(query, user);
   }
 }

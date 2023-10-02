@@ -42,8 +42,9 @@ export class RabbitMqTransactionConsumer {
       job.getRetryQueue(),
     );
     await channel.consume(
-      job.queueName,
+      job.getRetryQueue(),
       async (msg) => {
+        await channel.ack(msg);
         await job.consumer(msg, channel);
       },
       { noAck: false },
