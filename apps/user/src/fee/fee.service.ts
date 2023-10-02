@@ -6,7 +6,6 @@ import {
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { getAllFee } from './interface/get-all-fee.interface';
 
 @Injectable()
 export class FeeService {
@@ -18,7 +17,7 @@ export class FeeService {
     private systemFeeRepo: Repository<SystemFeeEntity>,
   ) {}
 
-  async getAllFee(idUser: string, payAmount: bigint): Promise<getAllFee> {
+  async getAllFee(idUser: string, payAmount: bigint) {
     const checkOwnFee = await this.ownFeeRepo.findOne({
       where: {
         user: {

@@ -1,8 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { TransactionService } from './transaction.service';
 import { User, UserEntity } from '@app/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { BeforeCreateTransactionDto } from './dto/before-create-transaction.dto';
+import { TransactionService } from './transaction.service';
+import { FindBankNumberDto } from './dto/find-bank-number.dto';
 
 @Controller('transaction')
 export class TransactionController {
@@ -22,5 +23,13 @@ export class TransactionController {
     @User() user: UserEntity,
   ) {
     return await this.transactionService.beforeCreate(data, user);
+  }
+
+  @Post('find/bank-number')
+  async banknumberCheck(
+    @Body()
+    data: FindBankNumberDto,
+  ) {
+    return await this.transactionService.banknumberCheck(data);
   }
 }

@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { CoreModule, EnvVariable, JwtModuleDynamic } from '@app/common';
+import {
+  CoreModule,
+  EnvVariable,
+  JwtModuleDynamic,
+  RabbitMqModule,
+  RabbitMqTransactionConsumer,
+} from '@app/common';
 import { AuthModule } from './auth/auth.module';
 import { JobModule } from './job/job.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -25,6 +31,7 @@ import { HistoryBalanceModule } from './history-balance/history-balance.module';
     UserBalanceModule,
     FeeModule,
     HistoryBalanceModule,
+    RabbitMqModule,
   ],
   controllers: [UserController],
   providers: [UserService, { provide: APP_GUARD, useClass: AuthGuard }],

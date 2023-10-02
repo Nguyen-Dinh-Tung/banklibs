@@ -1,10 +1,8 @@
 import {
-  HistoryBalanceEntity,
-  LENGTH_TRANSACTION_CODE,
-  PREFIX_TRANSACTION_CODE,
-  StatusTransactionEnum,
+  MessageRabbitMq,
+  RabbitMq,
+  ResponseInterface,
   TransactionEntity,
-  TypeTransactionEnum,
   UserBalanceEntity,
   UserEntity,
 } from '@app/common';
@@ -18,15 +16,20 @@ import {
 } from './dto/before-create-transaction.dto';
 import { UserBalanceService } from '../user-balance/user-balance.service';
 import { FeeService } from '../fee/fee.service';
-import { AppHttpBadRequestExceptionException } from '@app/exceptions';
-import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
-import { genCodeTransaction } from '@app/common/utils';
+import { BankNumberDto, FindBankNumberDto } from './dto/find-bank-number.dto';
+import { AppHttpBadRequestException, UserBalanceErrors } from '@app/exceptions';
 
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectRepository(TransactionEntity)
     private readonly transactionRepo: Repository<TransactionEntity>,
+
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
+
+    @InjectRepository(UserBalanceEntity)
+    private readonly userBalanceRepo: Repository<UserBalanceEntity>,
 
     private readonly userBalanceService: UserBalanceService,
 
@@ -36,111 +39,19 @@ export class TransactionService {
   ) {}
 
   async createTransaction(user: UserEntity, data: CreateTransactionDto) {
-    try {
-      await this.dataSource.transaction(async (manager) => {
-        const start = new Date().toISOString();
-        const allFee = await this.feeService.getAllFee(user.id, data.payAmount);
+    const res = await RabbitMq.send({
+      ...data,
+      payAmount: String(data.payAmount),
+      exchannelName: 'transacion-exchannel',
+      queueName: 'transacion-queue',
+      retryCounts: 0,
+      senderId: user.id,
+      start: new Date().toISOString(),
+    } as unknown as MessageRabbitMq);
 
-        const checkReceiver = await manager
-          .getRepository(UserBalanceEntity)
-          .createQueryBuilder('balance')
-          .setLock('pessimistic_read')
-          .setLock('pessimistic_write')
-          .leftJoinAndSelect('balance.user', 'user')
-          .where('balance.bankNumber = :bankNumber', {
-            bankNumber: data.bankNumber,
-          })
-          .getOne();
-
-        if (!checkReceiver) {
-          throw new AppHttpBadRequestExceptionException(
-            UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
-          );
-        }
-
-        const userBalanceTransfer = await manager
-          .getRepository(UserBalanceEntity)
-          .createQueryBuilder('balance')
-          .setLock('pessimistic_read')
-          .setLock('pessimistic_write')
-          .leftJoin('balance.user', 'user')
-          .where('user.id = :idUserTransfer', { idUserTransfer: user.id })
-          .getOne();
-
-        const payAmountReal =
-          allFee.amountOwnFee + allFee.amountSystemFee + data.payAmount;
-
-        if (userBalanceTransfer.surplus < payAmountReal) {
-          throw new AppHttpBadRequestExceptionException(
-            UserBalanceErrors.ERROR_INSUFFICIENT_BALANCE,
-          );
-        }
-
-        await manager
-          .getRepository(UserBalanceEntity)
-          .createQueryBuilder()
-          .update()
-          .set({ surplus: () => `surplus - ${payAmountReal}` })
-          .where('id = :idTransfer', { idTransfer: userBalanceTransfer.id })
-          .execute();
-
-        await manager
-          .getRepository(UserBalanceEntity)
-          .createQueryBuilder()
-          .update()
-          .set({ surplus: () => `surplus + ${data.payAmount}` })
-          .where('id = :idReceiver ', { idReceiver: checkReceiver.id })
-          .execute();
-
-        const newTransaction = await manager.save(TransactionEntity, {
-          amountOwnFee: allFee.amountOwnFee,
-          amountSystemFee: allFee.amountSystemFee,
-          amountPay: data.payAmount,
-          amountReal: payAmountReal,
-          bankNumber: data.bankNumber,
-          code: await genCodeTransaction(
-            PREFIX_TRANSACTION_CODE,
-            LENGTH_TRANSACTION_CODE,
-            manager.getRepository(TransactionEntity),
-          ),
-          content: data.content ? data.content : 'Transfer',
-          createdAt: start,
-          creator: user,
-          ownFee: allFee.ownFee,
-          systemFee: allFee.systemFee,
-          status: StatusTransactionEnum.SUCCESS,
-          receiver: checkReceiver.user,
-          typeTransaction: data.typeTransaction,
-          endTime: new Date().toISOString(),
-          percentFee: allFee.ownFee.percent + allFee.systemFee.percent,
-          systemHandle: false,
-        });
-
-        await manager.insert(HistoryBalanceEntity, {
-          createdAt: new Date().toISOString(),
-          endBalance:
-            BigInt(userBalanceTransfer.surplus) - BigInt(payAmountReal),
-          previousBalance: userBalanceTransfer.surplus,
-          transaction: newTransaction,
-          typeTransaction: data.typeTransaction,
-          userBalance: userBalanceTransfer,
-        });
-
-        await manager.insert(HistoryBalanceEntity, {
-          createdAt: new Date().toISOString(),
-          endBalance: BigInt(checkReceiver.surplus) + BigInt(data.payAmount),
-          previousBalance: checkReceiver.surplus,
-          transaction: newTransaction,
-          typeTransaction: data.typeTransaction,
-          userBalance: checkReceiver,
-        });
-      });
-      return { success: true };
-    } catch (e) {
-      if (e) {
-        throw new AppHttpBadRequestExceptionException(e.message);
-      }
-    }
+    return {
+      success: res,
+    };
   }
 
   async beforeCreate(data: BeforeCreateTransactionDto, user: UserEntity) {
@@ -170,6 +81,27 @@ export class TransactionService {
 
     return {
       docs: newBeforeTransactionInfor,
+    };
+  }
+
+  async banknumberCheck(data: FindBankNumberDto): Promise<ResponseInterface> {
+    const checkUserBalance = await this.userBalanceRepo.findOne({
+      where: {
+        bankNumber: data.bankNumber,
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (!checkUserBalance) {
+      throw new AppHttpBadRequestException(
+        UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
+      );
+    }
+
+    return {
+      docs: new BankNumberDto(checkUserBalance),
     };
   }
 }

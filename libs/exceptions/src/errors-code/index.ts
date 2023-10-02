@@ -7,3 +7,4 @@ export * from './verification.errors';
 export * from './transaction.errors';
 export * from './server.errors';
 export * from './fee.errors';
+export * from './user-balance.errors';

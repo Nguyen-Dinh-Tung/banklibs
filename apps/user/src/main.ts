@@ -1,3 +1,4 @@
+import { RabbitMqTransactionJobHandle } from './../../../libs/common/src/modules/rabbit-mq/rabbit-mq-transaction-job-handlle';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { UserModule } from './user.module';
 import { ConfigService } from '@nestjs/config';
@@ -7,6 +8,8 @@ import helmet from 'helmet';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { RabbitMq } from '@app/common';
+import { RabbitMqTransactionConsumer } from '@app/common';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(UserModule);
 
@@ -15,6 +18,22 @@ async function bootstrap() {
   morgan.token('body', function (req: any) {
     return JSON.stringify(req?.body ?? '{}');
   });
+
+  // setInterval(async () => {
+  //   if (count < 5) {
+  //     await RabbitMq.send({
+  //       bankNumber: 'any ' + count,
+  //       content: 'anyn',
+  //       exchannelName: transactionConsumer.exchannelName,
+  //       payAmount: '1000',
+  //       queueName: transactionConsumer.queueName,
+  //       routerKey: transactionConsumer.routerKey,
+  //       typeTransaction: TypeTransactionEnum.PAY,
+  //     });
+
+  //     count++;
+  //   }
+  // }, 2000);
 
   app.use(
     morgan(
@@ -62,6 +81,18 @@ async function bootstrap() {
   }
 
   app.useGlobalFilters(new AllFillterException(httpAdapter));
+
+  const transactionConsumer = app.get(RabbitMqTransactionConsumer);
+  const transactionJobHandle = app.get(RabbitMqTransactionJobHandle);
+
+  // await RabbitMq.connect();
+
+  // await RabbitMq.assertQueuesAndExchannel(transactionJobHandle);
+
+  // await transactionConsumer.startRabbitMqTransactionConsumer(
+  //   transactionJobHandle,
+  // );
+
   await app.listen(configService.get<number>('USER_PORT'));
 
   Logger.log(`SERVER RUNING PORT : ${configService.get<number>('USER_PORT')}`);
