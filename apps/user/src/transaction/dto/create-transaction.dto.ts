@@ -22,4 +22,10 @@ export class CreateTransactionDto {
   @IsString()
   @Length(0, 40)
   content: string;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  @IsString()
+  @Length(+process.env.OTP_EMAIL_LENGTH)
+  otp: string;
 }

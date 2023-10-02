@@ -26,7 +26,6 @@ import { AppHttpBadRequestException } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { getAllFee } from '@app/common/interfaces/get-all-fee.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateTransacionInterface } from '@app/common/interfaces';
 export class RabbitMqTransactionJobHandle {
   durable = true;
 
@@ -278,9 +277,4 @@ export class RabbitMqTransactionJobHandle {
       systemFee: checkSystemFee,
     };
   }
-
-  async createTransacion(
-    payload: CreateTransacionInterface,
-    manager: EntityManager,
-  ) {}
 }

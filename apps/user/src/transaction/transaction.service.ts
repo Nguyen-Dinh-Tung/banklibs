@@ -1,6 +1,7 @@
 import {
   MessageRabbitMq,
   RabbitMq,
+  ResponseInterface,
   TransactionEntity,
   UserBalanceEntity,
   UserEntity,
@@ -15,6 +16,8 @@ import {
 } from './dto/before-create-transaction.dto';
 import { UserBalanceService } from '../user-balance/user-balance.service';
 import { FeeService } from '../fee/fee.service';
+import { BankNumberDto, FindBankNumberDto } from './dto/find-bank-number.dto';
+import { AppHttpBadRequestException, UserBalanceErrors } from '@app/exceptions';
 
 @Injectable()
 export class TransactionService {
@@ -78,6 +81,27 @@ export class TransactionService {
 
     return {
       docs: newBeforeTransactionInfor,
+    };
+  }
+
+  async banknumberCheck(data: FindBankNumberDto): Promise<ResponseInterface> {
+    const checkUserBalance = await this.userBalanceRepo.findOne({
+      where: {
+        bankNumber: data.bankNumber,
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (!checkUserBalance) {
+      throw new AppHttpBadRequestException(
+        UserBalanceErrors.ERROR_RECEIVER_NOT_FOUND,
+      );
+    }
+
+    return {
+      docs: new BankNumberDto(checkUserBalance),
     };
   }
 }

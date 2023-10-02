@@ -85,13 +85,13 @@ async function bootstrap() {
   const transactionConsumer = app.get(RabbitMqTransactionConsumer);
   const transactionJobHandle = app.get(RabbitMqTransactionJobHandle);
 
-  await RabbitMq.connect();
+  // await RabbitMq.connect();
 
-  await RabbitMq.assertQueuesAndExchannel(transactionJobHandle);
+  // await RabbitMq.assertQueuesAndExchannel(transactionJobHandle);
 
-  await transactionConsumer.startRabbitMqTransactionConsumer(
-    transactionJobHandle,
-  );
+  // await transactionConsumer.startRabbitMqTransactionConsumer(
+  //   transactionJobHandle,
+  // );
 
   await app.listen(configService.get<number>('USER_PORT'));
 
