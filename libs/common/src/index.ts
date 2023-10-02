@@ -10,3 +10,4 @@ export * from './entities';
 export * from './interfaces';
 export * from './service';
 export * from './interceptor';
+export * from 'util';

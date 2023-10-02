@@ -18,6 +18,7 @@ import { UserBalanceService } from '../user-balance/user-balance.service';
 import { FeeService } from '../fee/fee.service';
 import { BankNumberDto, FindBankNumberDto } from './dto/find-bank-number.dto';
 import { AppHttpBadRequestException, UserBalanceErrors } from '@app/exceptions';
+import { QueryTransacionDto } from './dto/query-transaction.dto';
 
 @Injectable()
 export class TransactionService {
@@ -103,5 +104,9 @@ export class TransactionService {
     return {
       docs: new BankNumberDto(checkUserBalance),
     };
+  }
+
+  async findAll(query: QueryTransacionDto, user: UserEntity) {
+    const queryBuilder = this.transactionRepo.createQueryBuilder('transaction');
   }
 }
