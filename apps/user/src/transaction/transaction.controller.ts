@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Query } from '@nestjs/common';
+import { Body, Controller, Post, Get, Query, Param } from '@nestjs/common';
 import { User, UserEntity } from '@app/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { BeforeCreateTransactionDto } from './dto/before-create-transaction.dto';
@@ -37,5 +37,10 @@ export class TransactionController {
   @Get()
   async findAll(@Query() query: QueryTransacionDto, @User() user: UserEntity) {
     return await this.transactionService.findAll(query, user);
+  }
+
+  @Get('detail/:id')
+  async transactionDetail(@Param('id') id: string, @User() user: UserEntity) {
+    return await this.transactionService.transactionDetail(id, user);
   }
 }

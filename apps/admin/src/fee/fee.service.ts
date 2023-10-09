@@ -26,7 +26,7 @@ import { SystemFeeApplyDto } from './dto/system-fee-apply.dto';
 import {
   AppHttpBadRequestException,
   FeeErrors,
-  UserError,
+  UserErrors,
 } from '@app/exceptions';
 import { SystemFeeSettingDto } from './dto/system-fee-setting.dto';
 import { isAfter } from 'date-fns';
@@ -254,7 +254,7 @@ export class FeeService {
 
     if (checkUsers.length !== data.ids.length) {
       throw new AppHttpBadRequestException(
-        UserError.ERROR_ONE_OR_MORE_USER_NOT_FOUND,
+        UserErrors.ERROR_ONE_OR_MORE_USER_NOT_FOUND,
       );
     }
 

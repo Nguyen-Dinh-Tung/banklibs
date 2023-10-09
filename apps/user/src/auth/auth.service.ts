@@ -11,7 +11,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import {
   AppHttpBadRequestException,
   JobErrors,
-  UserError,
+  UserErrors,
 } from '@app/exceptions';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -55,7 +55,7 @@ export class AuthService {
     });
 
     if (checkUser) {
-      throw new AppHttpBadRequestException(UserError.ERROR_EXISTED_USER);
+      throw new AppHttpBadRequestException(UserErrors.ERROR_EXISTED_USER);
     }
 
     const checkJob = await this.jobRepo.findOne({
@@ -122,11 +122,11 @@ export class AuthService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequestException(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestException(UserErrors.ERROR_USER_NOT_EXISTTING);
     }
 
     if (!bcrypt.compareSync(data.password, checkUser.password)) {
-      throw new AppHttpBadRequestException(UserError.ERROR_PASSWORD_FAIL);
+      throw new AppHttpBadRequestException(UserErrors.ERROR_PASSWORD_FAIL);
     }
 
     return {
@@ -155,7 +155,7 @@ export class AuthService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequestException(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestException(UserErrors.ERROR_USER_NOT_EXISTTING);
     }
     return await this.otpService.forgotPassword(checkUser);
   }
@@ -168,7 +168,7 @@ export class AuthService {
     });
 
     if (!checkUser) {
-      throw new AppHttpBadRequestException(UserError.ERROR_USER_NOT_EXISTTING);
+      throw new AppHttpBadRequestException(UserErrors.ERROR_USER_NOT_EXISTTING);
     }
 
     await this.otpService.verifyOtpEmail(
