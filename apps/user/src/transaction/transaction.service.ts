@@ -20,7 +20,6 @@ import { FeeService } from '../fee/fee.service';
 import { BankNumberDto, FindBankNumberDto } from './dto/find-bank-number.dto';
 import {
   AppHttpBadRequestException,
-  TransactionErrors,
   UserBalanceErrors,
   UserErrors,
 } from '@app/exceptions';
@@ -95,7 +94,9 @@ export class TransactionService {
     };
   }
 
-  async banknumberCheck(data: FindBankNumberDto): Promise<ResponseInterface> {
+  async banknumberCheck(
+    data: FindBankNumberDto,
+  ): Promise<ResponseInterface<BankNumberDto>> {
     const checkUserBalance = await this.userBalanceRepo.findOne({
       where: {
         bankNumber: data.bankNumber,

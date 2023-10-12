@@ -10,7 +10,6 @@ export class UploaderService {
     if (Object.keys(files).length != 3) {
       throw new AppHttpBadRequestException(UploaderErrors.ERROR_MISSING_FILES);
     }
-
     const data: RegisterUserInterface = {
       avatar: '',
       frontCard: '',

@@ -1,6 +1,6 @@
 import { PageMetaDto } from '../dto';
 
-export interface ResponseInterface {
-  docs: any;
+export interface ResponseInterface<T> {
+  docs: T;
   metadata?: PageMetaDto;
 }

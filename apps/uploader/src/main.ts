@@ -47,7 +47,7 @@ async function bootstrap() {
 
   if (configService.get('USE_SWAGGER')) {
     const config = new DocumentBuilder()
-      .setTitle('User api')
+      .setTitle('Uploader api')
       .setDescription('Here have all api and description')
       .setVersion('1.0')
       .addBearerAuth()

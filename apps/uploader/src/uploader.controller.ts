@@ -1,13 +1,11 @@
 import {
-  Body,
   Controller,
-  FileTypeValidator,
-  ParseFilePipe,
   Patch,
   Post,
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
+  Body,
 } from '@nestjs/common';
 import { UploaderService } from './uploader.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -16,7 +14,8 @@ import {
   FileInterceptor,
 } from '@nestjs/platform-express';
 import { ValidatorFilesPipe } from './pipe/validate-files.pipe';
-import { ValidatorFilePipe } from './pipe/validate-file.pipe';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Uploader')
 @Controller('uploader')
@@ -33,8 +32,9 @@ export class UploaderController {
     ]),
   )
   registerUser(
+    @Body() data: RegisterUserDto,
     @UploadedFiles(new ValidatorFilesPipe())
-    files: Array<Express.Multer.File>,
+    files?: Array<Express.Multer.File>,
   ) {
     return this.uploaderService.registerUser(files);
   }
@@ -43,8 +43,9 @@ export class UploaderController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async updateUser(
-    @UploadedFile(new ValidatorFilePipe())
-    file: Express.Multer.File,
+    @Body() data: UpdateUserDto,
+    @UploadedFile(new ValidatorFilesPipe())
+    file?: Express.Multer.File,
   ) {
     return await this.uploaderService.updateUser(file);
   }

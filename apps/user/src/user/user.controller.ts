@@ -20,4 +20,9 @@ export class UserController {
   async verifyEmail(@Body() data: VerifyEmailDto, @User() user: UserEntity) {
     return await this.userSerive.verifyEmail(data, user);
   }
+
+  @Get('me')
+  async getMe(@User() user: UserEntity) {
+    return await this.userSerive.getMe(user);
+  }
 }

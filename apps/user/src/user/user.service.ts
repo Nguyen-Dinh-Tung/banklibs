@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { QueryUserDto, UserInfor } from './dto/query-user.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { QueryUserDto, UserInfor, UserInforDto } from './dto/query-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PageMetaDto, UserEntity, UserVerificationEntity } from '@app/common';
+import {
+  PageMetaDto,
+  UserBalanceEntity,
+  UserEntity,
+  UserVerificationEntity,
+} from '@app/common';
 import { Repository } from 'typeorm';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { OtpService } from '../otp/otp.service';
@@ -22,6 +27,9 @@ export class UserService {
 
     @InjectRepository(UserVerificationEntity)
     private readonly userVerificationRepo: Repository<UserVerificationEntity>,
+
+    @InjectRepository(UserBalanceEntity)
+    private readonly userBalanceRepo: Repository<UserBalanceEntity>,
   ) {}
 
   async findAll(query: QueryUserDto) {
@@ -112,5 +120,23 @@ export class UserService {
     );
 
     return { success: true };
+  }
+
+  async getMe(user: UserEntity) {
+    const checkBalance = await this.userBalanceRepo.findOne({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
+
+    return {
+      docs: {
+        ...user,
+        bankNumber: checkBalance.bankNumber,
+        surplus: String(checkBalance.surplus),
+      },
+    };
   }
 }

@@ -2,6 +2,7 @@ import {
   OwnFeeEntity,
   SystemFeeApplyUserEntity,
   SystemFeeEntity,
+  UserEntity,
 } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,6 +54,37 @@ export class FeeService {
       amountSystemFee: amountSystemFee,
       ownFee: checkOwnFee,
       systemFee: checkSystemFee,
+    };
+  }
+
+  async getOwnFee(user: UserEntity) {
+    const ownFee = await this.ownFeeRepo.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
+
+    return {
+      docs: ownFee,
+    };
+  }
+
+  async getSystemFee(user: UserEntity) {
+    const systemFee = await this.systemFeeRepo
+      .createQueryBuilder('system')
+      .leftJoin(
+        SystemFeeApplyUserEntity,
+        'apply',
+        'apply.system_fee_id = system.id',
+      )
+      .leftJoinAndSelect('apply.user', 'user')
+      .where('user.id = :userId', { userId: user.id })
+      .getMany();
+
+    return {
+      docs: systemFee,
     };
   }
 }
