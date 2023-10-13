@@ -18,7 +18,7 @@ export class PageRequest {
   @TransformType(() => Number)
   readonly limit: number = 10;
 
-  public getSkip() {
+  get skip() {
     return (this.page - 1) * this.limit;
   }
 }

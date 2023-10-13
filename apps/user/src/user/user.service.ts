@@ -35,7 +35,7 @@ export class UserService {
   async findAll(query: QueryUserDto) {
     const queryBuilder = this.userRepo
       .createQueryBuilder('user')
-      .offset(query.getSkip())
+      .offset(query.skip)
       .limit(query.limit)
       .orderBy('user.createdAt', query.order);
 

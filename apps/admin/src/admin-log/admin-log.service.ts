@@ -39,7 +39,7 @@ export class AdminLogService {
     const data = await this.adminLogsRepo.find({
       where: where,
       take: query.limit,
-      skip: query.getSkip(),
+      skip: query.skip,
     });
 
     return new AdminLogInfor(

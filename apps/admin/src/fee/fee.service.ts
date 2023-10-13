@@ -109,7 +109,7 @@ export class FeeService {
   async getSystemFee(query: QuerySystemfeeDto): Promise<SystemFeeInfor> {
     const queryBuilder = this.systemFeeRepo
       .createQueryBuilder('system')
-      .offset(query.getSkip())
+      .offset(query.skip)
       .limit(query.limit)
       .leftJoin(
         TransactionEntity,
@@ -428,7 +428,7 @@ export class FeeService {
   async getFeeUser(query: QueryOwnFeeDto) {
     const queryBuilder = this.ownFeeRepo
       .createQueryBuilder('ownFee')
-      .offset(query.getSkip())
+      .offset(query.skip)
       .limit(query.limit)
       .leftJoin(
         TransactionEntity,

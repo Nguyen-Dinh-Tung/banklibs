@@ -2,12 +2,14 @@ import {
   UniqueFieldUserInterface,
   BalanceEntity,
   UserEntity,
+  HistoryBalanceEntity,
+  PageMetaDto,
 } from '@app/common';
 import { AppHttpBadRequestException, ServerErrors } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { QueryBalanceDto } from './dto/query-balance.dto';
 
 @Injectable()
@@ -15,6 +17,9 @@ export class BalanceService {
   constructor(
     @InjectRepository(BalanceEntity)
     private readonly balanceRepo: Repository<BalanceEntity>,
+
+    @InjectRepository(HistoryBalanceEntity)
+    private readonly historyBalanceRepo: Repository<HistoryBalanceEntity>,
   ) {}
 
   async checkSurplusOrThrowError(id: string, payAmountReal: bigint) {
@@ -58,5 +63,44 @@ export class BalanceService {
     return checkReceiver;
   }
 
-  async getHistory(query: QueryBalanceDto, user: UserEntity) {}
+  async getHistory(query: QueryBalanceDto, user: UserEntity) {
+    const checkBalance = await this.balanceRepo.findOne({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
+
+    const conditions = {};
+
+    if (query.endDate) {
+      conditions['createdAt'] = LessThan(query.endDate);
+    } else {
+      conditions['createdAt'] = MoreThanOrEqual(query.startDate);
+    }
+
+    const data = await this.historyBalanceRepo.findAndCount({
+      where: {
+        userBalance: {
+          id: checkBalance.id,
+        },
+        ...conditions,
+      },
+      take: query.limit,
+      skip: query.skip,
+      relations: {
+        transaction: true,
+      },
+    });
+
+    return {
+      docs: data[0],
+      metadata: new PageMetaDto({
+        page: query.page,
+        limit: query.limit,
+        total: data[1],
+      }),
+    };
+  }
 }

@@ -15,7 +15,7 @@ export class JobService {
     const queryBuilder = this.jobRepo
       .createQueryBuilder('job')
       .orderBy('job.createdAt', query.order)
-      .offset(query.getSkip())
+      .offset(query.skip)
       .limit(query.limit);
 
     if (query.startDate) {

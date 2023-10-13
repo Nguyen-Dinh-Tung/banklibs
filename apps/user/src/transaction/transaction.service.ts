@@ -138,7 +138,7 @@ export class TransactionService {
         }),
       )
       .orderBy('transaction.createdAt', query.order)
-      .offset(query.getSkip())
+      .offset(query.skip)
       .limit(query.limit);
 
     if (query.code) {
