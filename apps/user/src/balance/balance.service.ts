@@ -1,19 +1,24 @@
-import { UniqueFieldUserInterface, UserBalanceEntity } from '@app/common';
+import {
+  UniqueFieldUserInterface,
+  BalanceEntity,
+  UserEntity,
+} from '@app/common';
 import { AppHttpBadRequestException, ServerErrors } from '@app/exceptions';
 import { UserBalanceErrors } from '@app/exceptions/errors-code/user-balance.errors';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { QueryBalanceDto } from './dto/query-balance.dto';
 
 @Injectable()
-export class UserBalanceService {
+export class BalanceService {
   constructor(
-    @InjectRepository(UserBalanceEntity)
-    private readonly userBalanceRepo: Repository<UserBalanceEntity>,
+    @InjectRepository(BalanceEntity)
+    private readonly balanceRepo: Repository<BalanceEntity>,
   ) {}
 
   async checkSurplusOrThrowError(id: string, payAmountReal: bigint) {
-    const checkSurplus = await this.userBalanceRepo.findOne({
+    const checkSurplus = await this.balanceRepo.findOne({
       where: {
         user: {
           id: id,
@@ -34,8 +39,8 @@ export class UserBalanceService {
     return true;
   }
 
-  async checkReceiver(bankNumber: string): Promise<UserBalanceEntity> {
-    const checkReceiver = await this.userBalanceRepo.findOne({
+  async checkReceiver(bankNumber: string): Promise<BalanceEntity> {
+    const checkReceiver = await this.balanceRepo.findOne({
       where: {
         bankNumber: bankNumber,
       },
@@ -52,4 +57,6 @@ export class UserBalanceService {
 
     return checkReceiver;
   }
+
+  async getHistory(query: QueryBalanceDto, user: UserEntity) {}
 }

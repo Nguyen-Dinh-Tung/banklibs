@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { IdDateEntity, NotNullColum } from '../database';
-import { UserAdminEntity } from './user-admins.entity';
+import { UserAdminEntity } from './user-admin.entity';
 
 @Entity('admin_logs')
 export class AdminLogsEntity extends IdDateEntity {

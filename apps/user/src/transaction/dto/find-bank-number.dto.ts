@@ -1,4 +1,4 @@
-import { UserBalanceEntity } from '@app/common';
+import { BalanceEntity } from '@app/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, Length } from 'class-validator';
 
@@ -14,7 +14,7 @@ export class BankNumberDto {
 
   bankNumber: string;
 
-  constructor(entity: UserBalanceEntity) {
+  constructor(entity: BalanceEntity) {
     this.fullname = entity.user.fullname;
 
     this.bankNumber = entity.bankNumber;

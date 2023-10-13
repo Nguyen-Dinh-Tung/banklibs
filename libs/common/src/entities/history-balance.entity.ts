@@ -1,4 +1,4 @@
-import { UserBalanceEntity } from './user-balance.entity';
+import { BalanceEntity } from './balance.entity';
 import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { IdDateEntity, NotNullColum } from '../database';
 import { TransactionEntity } from './transaction.entity';
@@ -6,9 +6,9 @@ import { RefundEntity } from './refund.entity';
 
 @Entity('history_balance')
 export class HistoryBalanceEntity extends IdDateEntity {
-  @ManyToOne(() => UserBalanceEntity, (balance) => balance.id)
+  @ManyToOne(() => BalanceEntity, (balance) => balance.id)
   @JoinColumn({ name: 'user_balance' })
-  userBalance: UserBalanceEntity;
+  userBalance: BalanceEntity;
 
   @NotNullColum({ name: 'previous_balance', type: 'bigint' })
   previousBalance: bigint;

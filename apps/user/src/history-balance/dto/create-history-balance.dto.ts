@@ -1,8 +1,8 @@
-import { TransactionEntity, UserBalanceEntity } from '@app/common';
+import { TransactionEntity, BalanceEntity } from '@app/common';
 import { RefundEntity } from '@app/common/entities/refund.entity';
 
 export class CreateHistoryBalance {
-  userBalance: UserBalanceEntity;
+  userBalance: BalanceEntity;
 
   previousBalance: bigint;
 

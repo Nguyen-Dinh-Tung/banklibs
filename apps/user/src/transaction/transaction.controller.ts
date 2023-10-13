@@ -5,8 +5,11 @@ import { BeforeCreateTransactionDto } from './dto/before-create-transaction.dto'
 import { TransactionService } from './transaction.service';
 import { FindBankNumberDto } from './dto/find-bank-number.dto';
 import { QueryTransacionDto } from './dto/query-transaction.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('transaction')
+@ApiTags('Transaction')
+@ApiBearerAuth()
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 

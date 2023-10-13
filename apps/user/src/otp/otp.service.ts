@@ -34,7 +34,7 @@ export class OtpService {
     const otp = otpEmailRandom(+process.env.OTP_EMAIL_LENGTH);
 
     if (checkExistOtp) {
-      if (Number(checkExistOtp.expires) > Number(Date.now())) {
+      if (Number(checkExistOtp.expires) > Date.now()) {
         if (checkExistOtp.times >= +process.env.MAX_GENERATE_OTP_EMAIL) {
           throw new AppHttpBadRequestException(
             OtpErrors.ERROR_MAX_GENERATE_OTP,

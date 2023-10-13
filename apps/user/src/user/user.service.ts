@@ -3,7 +3,7 @@ import { QueryUserDto, UserInfor, UserInforDto } from './dto/query-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   PageMetaDto,
-  UserBalanceEntity,
+  BalanceEntity,
   UserEntity,
   UserVerificationEntity,
 } from '@app/common';
@@ -28,8 +28,8 @@ export class UserService {
     @InjectRepository(UserVerificationEntity)
     private readonly userVerificationRepo: Repository<UserVerificationEntity>,
 
-    @InjectRepository(UserBalanceEntity)
-    private readonly userBalanceRepo: Repository<UserBalanceEntity>,
+    @InjectRepository(BalanceEntity)
+    private readonly balanceRepo: Repository<BalanceEntity>,
   ) {}
 
   async findAll(query: QueryUserDto) {
@@ -123,7 +123,7 @@ export class UserService {
   }
 
   async getMe(user: UserEntity) {
-    const checkBalance = await this.userBalanceRepo.findOne({
+    const checkBalance = await this.balanceRepo.findOne({
       where: {
         user: {
           id: user.id,

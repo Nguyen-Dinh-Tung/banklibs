@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, OneToOne } from 'typeorm';
 import { DateColumn, IdDateEntity, NotNullColum } from '../database';
 import { UserEntity } from './user.enitty';
-import { UserAdminEntity } from './user-admins.entity';
+import { UserAdminEntity } from './user-admin.entity';
 
 @Entity('own_fee')
 export class OwnFeeEntity extends IdDateEntity {

@@ -8,7 +8,7 @@ import {
   SystemFeeApplyUserEntity,
   SystemFeeEntity,
   TransactionEntity,
-  UserBalanceEntity,
+  BalanceEntity,
 } from '@app/common/entities';
 import { StatusTransactionEnum, TypeTransactionEnum } from '@app/common/enum';
 import { genCodeTransaction } from '@app/common/utils';
@@ -78,7 +78,7 @@ export class RabbitMqTransactionJobHandle {
 
         try {
           res = await manager
-            .createQueryBuilder(UserBalanceEntity, 'balance')
+            .createQueryBuilder(BalanceEntity, 'balance')
             .update()
             .set({
               surplus: () => `surplus - ${transacionInformation.payAmountReal}`,
@@ -113,7 +113,7 @@ export class RabbitMqTransactionJobHandle {
         }
 
         await manager
-          .createQueryBuilder(UserBalanceEntity, 'balance')
+          .createQueryBuilder(BalanceEntity, 'balance')
           .update()
           .set({
             surplus: () => `surplus + ${transacionInformation.payAmountReal}`,
@@ -276,7 +276,7 @@ export class RabbitMqTransactionJobHandle {
     );
 
     const checkReceiver = await this.dataSource
-      .getRepository(UserBalanceEntity)
+      .getRepository(BalanceEntity)
       .createQueryBuilder('balance')
       .leftJoinAndSelect('balance.user', 'user')
       .where('balance.bankNumber = :bankNumber', {
@@ -285,7 +285,7 @@ export class RabbitMqTransactionJobHandle {
       .getOne();
 
     const senderBalance = await this.dataSource
-      .getRepository(UserBalanceEntity)
+      .getRepository(BalanceEntity)
       .createQueryBuilder('balance')
       .leftJoinAndSelect('balance.user', 'user')
       .where('user.id = :idUserTransfer', {

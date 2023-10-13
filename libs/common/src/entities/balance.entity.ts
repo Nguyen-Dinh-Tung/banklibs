@@ -3,13 +3,13 @@ import { IdDateEntity, NotNullColum } from '../database';
 import { UserEntity } from './user.enitty';
 import { HistoryBalanceEntity } from './history-balance.entity';
 
-@Entity('user_balance')
+@Entity('balance')
 @Check(`"surplus" > 0`)
-export class UserBalanceEntity extends IdDateEntity {
+export class BalanceEntity extends IdDateEntity {
   @OneToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
-  
+
   @NotNullColum({ default: 0, type: 'bigint', unsigned: true })
   surplus: bigint;
 

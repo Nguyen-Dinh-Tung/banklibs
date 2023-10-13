@@ -10,7 +10,7 @@ import {
   SystemFeeEntity,
   TransactionEntity,
   UserAdminEntity,
-  UserBalanceEntity,
+  BalanceEntity,
   UserEntity,
   UserVerificationEntity,
 } from './entities';
@@ -42,7 +42,7 @@ export class CoreModule {
           UserVerificationEntity,
           JobEntity,
           HistoryBalanceEntity,
-          UserBalanceEntity,
+          BalanceEntity,
           TransactionEntity,
           RefundEntity,
           SystemFeeEntity,

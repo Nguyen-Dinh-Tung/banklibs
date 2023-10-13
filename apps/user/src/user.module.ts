@@ -15,7 +15,7 @@ import { AuthGuard } from './auth/guard/auth.guard';
 import { UserModule as UsersModule } from './user/user.module';
 import { OtpModule } from './otp/otp.module';
 import { TransactionModule } from './transaction/transacion.module';
-import { UserBalanceModule } from './user-balance/user-balance.module';
+import { BalanceModule } from './balance/balance.module';
 import { FeeModule } from './fee/fee.module';
 import { HistoryBalanceModule } from './history-balance/history-balance.module';
 
@@ -28,7 +28,7 @@ import { HistoryBalanceModule } from './history-balance/history-balance.module';
     UsersModule,
     OtpModule.Register(),
     TransactionModule,
-    UserBalanceModule,
+    BalanceModule,
     FeeModule,
     HistoryBalanceModule,
     RabbitMqModule,

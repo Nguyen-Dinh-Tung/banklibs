@@ -17,7 +17,7 @@ import {
 import { UserVerificationEntity } from './user-verification.entity';
 import * as bcrypt from 'bcrypt';
 import { JobEntity } from './job.entity';
-import { UserBalanceEntity } from './user-balance.entity';
+import { BalanceEntity } from './balance.entity';
 
 @Entity('user')
 @Unique('user_unique', ['identifierNumber', 'email'])
@@ -73,7 +73,7 @@ export class UserEntity extends IdDateEntity {
   })
   verifies: UserVerificationEntity[];
 
-  @OneToOne(() => UserBalanceEntity, (balance) => balance.id)
+  @OneToOne(() => BalanceEntity, (balance) => balance.id)
   @JoinColumn()
-  balance: UserBalanceEntity;
+  balance: BalanceEntity;
 }

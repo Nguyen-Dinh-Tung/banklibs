@@ -1,6 +1,6 @@
 import {
   JobEntity,
-  UserBalanceEntity,
+  BalanceEntity,
   UserEntity,
   UserVerificationEntity,
 } from '@app/common/entities';
@@ -41,8 +41,8 @@ export class AuthService {
     @InjectRepository(JobEntity)
     private readonly jobRepo: Repository<JobEntity>,
 
-    @InjectRepository(UserBalanceEntity)
-    private readonly userBanlance: Repository<UserBalanceEntity>,
+    @InjectRepository(BalanceEntity)
+    private readonly userBanlance: Repository<BalanceEntity>,
 
     private readonly jwtService: JwtService,
 

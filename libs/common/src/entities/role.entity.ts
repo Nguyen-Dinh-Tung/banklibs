@@ -1,7 +1,7 @@
 import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { IdDateEntity, IsActiveTrueColumn, NotNullColum } from '../database';
 import { RoleActionsEnum } from '../enum/database.enum';
-import { UserAdminEntity } from './user-admins.entity';
+import { UserAdminEntity } from './user-admin.entity';
 
 @Entity('role')
 export class RoleEntity extends IdDateEntity {

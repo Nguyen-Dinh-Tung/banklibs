@@ -4,7 +4,7 @@ import {
   StatusTransactionEnum,
   TransactionEntity,
   TypeTransactionEnum,
-  UserBalanceEntity,
+  BalanceEntity,
   logger,
 } from '@app/common';
 import { RefundEntity } from '@app/common/entities/refund.entity';
@@ -55,7 +55,7 @@ export class TransactionService {
   async handleTransacion(transacion: TransactionEntity) {
     await this.dataSource.transaction(async (manager) => {
       const userBalanceTransfer = await manager
-        .getRepository(UserBalanceEntity)
+        .getRepository(BalanceEntity)
         .createQueryBuilder('balance')
         .leftJoin('balance.user', 'user')
         .where('user.id = :idUserTransfer', {
@@ -64,7 +64,7 @@ export class TransactionService {
         .getOne();
 
       const receiverBalance = await manager
-        .getRepository(UserBalanceEntity)
+        .getRepository(BalanceEntity)
         .findOne({
           where: {
             user: {
@@ -80,7 +80,7 @@ export class TransactionService {
       }
 
       let res = await manager
-        .getRepository(UserBalanceEntity)
+        .getRepository(BalanceEntity)
         .createQueryBuilder()
         .update()
         .set({ surplus: () => `surplus - ${transacion.amountReal}` })
@@ -89,7 +89,7 @@ export class TransactionService {
 
       while (!res.affected) {
         res = await manager
-          .getRepository(UserBalanceEntity)
+          .getRepository(BalanceEntity)
           .createQueryBuilder()
           .update()
           .set({ surplus: () => `surplus - ${transacion.amountReal}` })
@@ -98,7 +98,7 @@ export class TransactionService {
       }
 
       await manager
-        .getRepository(UserBalanceEntity)
+        .getRepository(BalanceEntity)
         .createQueryBuilder()
         .update()
         .set({ surplus: () => `surplus + ${transacion.amountPay}` })

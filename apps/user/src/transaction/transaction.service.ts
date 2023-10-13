@@ -4,7 +4,7 @@ import {
   RabbitMq,
   ResponseInterface,
   TransactionEntity,
-  UserBalanceEntity,
+  BalanceEntity,
   UserEntity,
 } from '@app/common';
 import { Injectable } from '@nestjs/common';
@@ -15,7 +15,7 @@ import {
   BeforeCreateTransactionDto,
   BeforeCreateTransactionInforDto,
 } from './dto/before-create-transaction.dto';
-import { UserBalanceService } from '../user-balance/user-balance.service';
+import { BalanceService } from '../balance/balance.service';
 import { FeeService } from '../fee/fee.service';
 import { BankNumberDto, FindBankNumberDto } from './dto/find-bank-number.dto';
 import {
@@ -38,10 +38,10 @@ export class TransactionService {
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
 
-    @InjectRepository(UserBalanceEntity)
-    private readonly userBalanceRepo: Repository<UserBalanceEntity>,
+    @InjectRepository(BalanceEntity)
+    private readonly balanceRepo: Repository<BalanceEntity>,
 
-    private readonly userBalanceService: UserBalanceService,
+    private readonly BalanceService: BalanceService,
 
     private readonly feeService: FeeService,
 
@@ -70,12 +70,12 @@ export class TransactionService {
       data.payAmount,
     );
 
-    const canExcute = await this.userBalanceService.checkSurplusOrThrowError(
+    const canExcute = await this.BalanceService.checkSurplusOrThrowError(
       user.id,
       data.payAmount + checkAllFee.amountOwnFee + checkAllFee.amountSystemFee,
     );
 
-    const checkReceiver = await this.userBalanceService.checkReceiver(
+    const checkReceiver = await this.BalanceService.checkReceiver(
       data.bankNumber,
     );
 
@@ -97,7 +97,7 @@ export class TransactionService {
   async banknumberCheck(
     data: FindBankNumberDto,
   ): Promise<ResponseInterface<BankNumberDto>> {
-    const checkUserBalance = await this.userBalanceRepo.findOne({
+    const checkUserBalance = await this.balanceRepo.findOne({
       where: {
         bankNumber: data.bankNumber,
       },
